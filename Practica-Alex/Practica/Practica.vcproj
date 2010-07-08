@@ -252,6 +252,14 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\Entity_Utils.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Entity_Utils.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Image_Utils.cpp"
 				>
 			</File>

@@ -9,7 +9,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 
-bool KImageClustering::IsValidImage(KImage& image)
+static bool IsValidImage(KImage& image)
 {
 	if (!image.IsValid())
 	{
@@ -26,7 +26,7 @@ bool KImageClustering::IsValidImage(KImage& image)
 	}
 }
 
-void KImageClustering::DoClustering(KImage& image, KImagePage& imagePage, /*OUT*/ CArray<KEntityCollection*, KEntityCollection*>& clusters)
+void KImageClustering::DoClustering(KImage& image, KImagePage& imagePage, /*OUT*/ KEntityPointersArray& clusters)
 {
 	// no clustering, just basic example on how to use framework classes..
 

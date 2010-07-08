@@ -11,7 +11,7 @@ private:
 	float* histogram;
 
 public:
-	enum Channel { RED = 1, GREEN = 2, BLUE = 4, GRAYSCALE = 8 };
+	const enum Channel { RED = 1, GREEN = 2, BLUE = 4, GRAYSCALE = 8 };
 
 	KHistogram(CArray<int>& data);
 	KHistogram(KHistogram& original);
