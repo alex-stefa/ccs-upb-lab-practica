@@ -8,13 +8,13 @@
 class KTextFilters 
 {
 public:
-	static KEntityPointersArray FilterLetters(KEntityPointersArray& letters, 
+	static void FilterLetters(KEntityPointersArray& letters, 
 		bool useWidthFilter = true, bool useInsideFilter = true, bool useMergeFilter = true);
 
 	/* DEBUG */
 	static bool DebugEnabled;
 	static char* DebugOutputPath;
-	static char* BoundingBoxDiagramFilename;
+	static char* DebugFilenamePrefix;
 };
 
 #endif  //__TEXT_FILTERS__

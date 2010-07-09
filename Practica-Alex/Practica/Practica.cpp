@@ -6,6 +6,8 @@
 
 #include "Image_Utils.h"
 #include "Entity_Utils.h"
+#include "Text_Filters.h"
+
 
 
 #ifdef _DEBUG
@@ -45,6 +47,12 @@ int main(int argc, char* argv)
 	KEntityDrawing::DrawEntityArray(outImg, *entities, KEntityDrawing::BOUNDING_RECTANGLE + KEntityDrawing::ENTITY_PIXELS);
 	outImg.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-ent.tif"));
 
+	KTextFilters::FilterLetters(*entities);
+	
+	KImage outImg2(pTestImg->GetPixelSize(), 24);
+	outImg2.Invert();
+	KEntityDrawing::DrawEntityArray(outImg2, *entities, KEntityDrawing::BOUNDING_RECTANGLE + KEntityDrawing::ENTITY_PIXELS);
+	outImg2.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-filters-inside.tif"));
 
 	delete entities;
 	delete pImgPage;
