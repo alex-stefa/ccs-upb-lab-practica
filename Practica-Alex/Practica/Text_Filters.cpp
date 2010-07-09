@@ -44,46 +44,46 @@ static int NumberOfPixels(KEntity& entity)
 
 static void InsideFilter(KEntityPointersArray& initialEntities, /*OUT*/ KEntityPointersArray& filteredEntities)
 {
-	list<KGenericEntity> entities;
+	list<KGenericEntity*> entities;
 	for (int i = 0; i < initialEntities.GetSize(); ++i)
 	{
 		KGenericEntity* entity = (KGenericEntity*) initialEntities[i];
 		ASSERT(entity != NULL);
-		entities.push_back(*entity);
+		entities.push_back(entity);
 	}
 
-	typedef list<KGenericEntity>::iterator EntityIter;
-	int i, j;
+	typedef list<KGenericEntity*>::iterator EntityIter;
 
-	i = 0;
-	for (EntityIter iter1 = entities.begin(); iter1 != entities.end(); ++iter1)
+	EntityIter iter1 = entities.begin();
+	while (iter1 != entities.end())
 	{
-		i++;
-		j = 0;
-		for (EntityIter iter2 = iter1; iter2 != entities.end(); ++iter2)
+		EntityIter iter2 = iter1;
+		++iter2;
+		while (iter2 != entities.end())
 		{
-			++iter2;
-			j++;
-			if (iter1->boundingRectangle.PtInRect(iter2->boundingRectangle.CenterPoint()) ||
-				iter2->boundingRectangle.PtInRect(iter1->boundingRectangle.CenterPoint()))
+			if ((*iter1)->boundingRectangle.PtInRect((*iter2)->boundingRectangle.CenterPoint()) ||
+				(*iter2)->boundingRectangle.PtInRect((*iter1)->boundingRectangle.CenterPoint()))
 			{
-				TRACE("\n%d %d\n", i, j);
-				KEntityCollection* collection = new KEntityCollection(iter1->ImagePageOwner);
-				collection->AddChild(&(*iter1));
-				collection->AddChild(&(*iter2));
-				iter2 = entities.erase(iter2);
+				KEntityCollection* collection = new KEntityCollection((*iter1)->ImagePageOwner);
+				(*iter1)->ImagePageOwner->AddChild(collection);
+				collection->AddChild(*iter1);
+				collection->AddChild(*iter2);
 				iter1 = entities.erase(iter1);
-				iter1 = entities.insert(iter1, *collection);
-				break;
+				*iter2 = collection;
+				break; // stop at first entity inclusion
 			}
+			++iter2;
 		}
+		if (iter2 == entities.end()) // no merging performed
+			++iter1;
 	}
 
 	filteredEntities.RemoveAll();
 	filteredEntities.SetSize(entities.size());
 
+	int position = 0;
 	for (EntityIter iter = entities.begin(); iter != entities.end(); ++iter)
-		filteredEntities.Add(&(*iter));
+		filteredEntities[position++] = *iter;
 }
 
 

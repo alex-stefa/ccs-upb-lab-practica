@@ -39,13 +39,13 @@ int main(int argc, char* argv)
 	TRACE("Avg Height [mean]: %.3f\n", avg_height_mean);
 	TRACE("Avg Height [histogram]: %.3f\n", avg_height_hist);
 
-	TRACE("Removed if not in [0..5]*avg_size: %d\n", KEntityUtils::FilterBySize(*entities, *entities, 
-		0, 0, 5 * avg_width_mean, 5 * avg_height_mean));
+	//TRACE("Removed if not in [0..5]*avg_size: %d\n", KEntityUtils::FilterBySize(*entities, *entities, 
+	//	0, 0, 5 * avg_width_mean, 5 * avg_height_mean));
 
-	KImage outImg(pTestImg->GetPixelSize(), 24);
-	outImg.Invert();
-	KEntityDrawing::DrawEntityArray(outImg, *entities, KEntityDrawing::BOUNDING_RECTANGLE + KEntityDrawing::ENTITY_PIXELS);
-	outImg.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-ent.tif"));
+	//KImage outImg(pTestImg->GetPixelSize(), 24);
+	//outImg.Invert();
+	//KEntityDrawing::DrawEntityArray(outImg, *entities, KEntityDrawing::BOUNDING_RECTANGLE + KEntityDrawing::ENTITY_PIXELS);
+	//outImg.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-ent.tif"));
 
 	KTextFilters::FilterLetters(*entities);
 	
@@ -55,6 +55,7 @@ int main(int argc, char* argv)
 	outImg2.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-filters-inside.tif"));
 
 	delete entities;
+	pImgPage->DestroyAllChildren();
 	delete pImgPage;
 	delete pTestImg;
 
