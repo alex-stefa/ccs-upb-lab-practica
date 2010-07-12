@@ -54,10 +54,11 @@ int main(int argc, char* argv)
 	KEntityDrawing::DrawEntityArray(outImg2, *entities, KEntityDrawing::BOUNDING_RECTANGLE + KEntityDrawing::ENTITY_PIXELS);
 	outImg2.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-filters-inside.tif"));
 
-	delete entities;
-	pImgPage->DestroyAllChildren();
+	//pImgPage->DestroyAllChildren(); // some memory is still occupied with smth..
+	KTextFilters::DoCleanup();
 	delete pImgPage;
 	delete pTestImg;
+	delete entities;
 
 	TRACE("\n\nALL DONE IN %.3f (s)!", (float) (clock() - start_time) / CLOCKS_PER_SEC);
 	getchar();

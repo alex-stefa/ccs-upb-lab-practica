@@ -20,10 +20,15 @@ using namespace std;
 	if (baseType && *baseType != CCS_LEVEL0) \
 	{ TRACE("Input entities are not LEVEL0 type!\n");  ASSERT(false); return KEntityPointersArray(); } 
 
+#define MARK_DELETE(pEntity) \
+	if (KTextFilters::toDelete == NULL) KTextFilters::toDelete = new KEntityPointersArray(); \
+	KTextFilters::toDelete->Add(pEntity);
+
 
 bool KTextFilters::DebugEnabled = false;
 char* KTextFilters::DebugOutputPath = ".\\";
 char* KTextFilters::DebugFilenamePrefix = "text-filters";
+KEntityPointersArray* KTextFilters::toDelete = new KEntityPointersArray();
 
 
 //! Returns number of pixels inside a level0 entity (seems KEntity.intNumberOfPixels is never assigned!)
@@ -41,8 +46,18 @@ static int NumberOfPixels(KEntity& entity)
 	return pixelCount;
 }
 
+void KTextFilters::DoCleanup()
+{
+	if (toDelete != NULL)
+	{
+		toDelete->DestroyAllEntities();
+		delete toDelete;
+		toDelete = NULL;
+	}
+}
 
-static void InsideFilter(KEntityPointersArray& initialEntities, /*OUT*/ KEntityPointersArray& filteredEntities)
+void KTextFilters::InsideFilter(KEntityPointersArray& initialEntities, 
+								/*OUT*/ KEntityPointersArray& filteredEntities)
 {
 	list<KGenericEntity*> entities;
 	for (int i = 0; i < initialEntities.GetSize(); ++i)
@@ -65,7 +80,9 @@ static void InsideFilter(KEntityPointersArray& initialEntities, /*OUT*/ KEntityP
 				(*iter2)->boundingRectangle.PtInRect((*iter1)->boundingRectangle.CenterPoint()))
 			{
 				KEntityCollection* collection = new KEntityCollection((*iter1)->ImagePageOwner);
-				(*iter1)->ImagePageOwner->AddChild(collection);
+				//(*iter1)->ImagePageOwner->AddChild(collection); 
+				// to free memory, pImgPage->DestroyAllChildren() should delete them all but it doesn't..
+				MARK_DELETE(collection);
 				collection->AddChild(*iter1);
 				collection->AddChild(*iter2);
 				iter1 = entities.erase(iter1);
@@ -74,7 +91,7 @@ static void InsideFilter(KEntityPointersArray& initialEntities, /*OUT*/ KEntityP
 			}
 			++iter2;
 		}
-		if (iter2 == entities.end()) // no merging performed
+		if (iter2 == entities.end()) // if no merging performed..
 			++iter1;
 	}
 
