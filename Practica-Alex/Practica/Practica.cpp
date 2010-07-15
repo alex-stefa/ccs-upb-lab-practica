@@ -22,7 +22,9 @@ int main(int argc, char* argv)
 	clock_t start_time = clock();
 
 	KImage* pTestImg = new KImage(CString("..\\Test_Images\\input\\01BPP.tif"), NULL);
+	ASSERT(pTestImg->IsBitonal());
 	KImagePage* pImgPage = new KImagePage(pTestImg);
+    pImgPage->SetAsActivePage(true);
 	
 	KEntityPointersArray* entities = new KEntityPointersArray();
 	KEntityUtils::CopyEntityArray(*(pImgPage->GetEntities()), *entities);
@@ -54,7 +56,25 @@ int main(int argc, char* argv)
 	KEntityDrawing::DrawEntityArray(outImg2, *entities, KEntityDrawing::BOUNDING_RECTANGLE + KEntityDrawing::ENTITY_PIXELS);
 	outImg2.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-filters-inside.tif"));
 
-	//pImgPage->DestroyAllChildren(); // some memory is still occupied with smth..
+	TRACE("\nNumber of Pixels:\n");
+	for (int i = 0; i < entities->GetSize(); ++i)
+	{
+		KGenericEntity* pEntity = (KGenericEntity*) entities->GetAt(i);
+		KPropValue val;
+		pEntity->GetPropertyValue(CCS_NUMBER_OF_PIXELS, val);
+		TRACE("%d ", (int) val);
+	}
+
+	TRACE("\Convex Hull:\n");
+	for (int i = 0; i < entities->GetSize(); ++i)
+	{
+		KGenericEntity* pEntity = (KGenericEntity*) entities->GetAt(i);
+		KPropValue val;
+		pEntity->GetPropertyValue(CCS_CONVEX_HULL, val);
+		KPointSet* hull = (KPointSet*) (KPropertyInspector*) val;
+		TRACE("%d ", hull->GetSize());
+	}
+
 	KTextFilters::DoCleanup();
 	delete pImgPage;
 	delete pTestImg;

@@ -80,8 +80,6 @@ void KTextFilters::InsideFilter(KEntityPointersArray& initialEntities,
 				(*iter2)->boundingRectangle.PtInRect((*iter1)->boundingRectangle.CenterPoint()))
 			{
 				KEntityCollection* collection = new KEntityCollection((*iter1)->ImagePageOwner);
-				//(*iter1)->ImagePageOwner->AddChild(collection); 
-				// to free memory, pImgPage->DestroyAllChildren() should delete them all but it doesn't..
 				MARK_DELETE(collection);
 				collection->AddChild(*iter1);
 				collection->AddChild(*iter2);
