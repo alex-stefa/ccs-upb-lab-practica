@@ -139,7 +139,26 @@ void KAreaVoronoi::BuildAreaVoronoiDiagram(int sampleRate, float voronoiMinDist)
 void KAreaVoronoi::BuildDelaunayDiagram()
 {
 
+    //if (objs.size() == 0)
+    //    fillObjects();
 
+    //VertexSet centers;
+    //TriangleSet triangles;
+    //EdgeSet edges;
+    //QVector<QLineF> rEdges;
+
+    //foreach(VzGraphicsObj* obj, objs) {
+    //    centers.insert(GetCenter(obj));
+    //}
+
+    //Delaunay d;
+    //d.Triangulate(centers, triangles);
+    //d.TrianglesToEdges(triangles, edges);
+
+    //for (EdgeSet::const_iterator eIt = edges.begin(); eIt != edges.end(); eIt++)
+    //    rEdges.append(QLineF(eIt->v1->GetPoint(), eIt->v2->GetPoint()));
+
+    //return rEdges;
 
 }
 
