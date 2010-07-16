@@ -347,11 +347,11 @@
 			Name="Voronoi"
 			>
 			<File
-				RelativePath=".\AreaVoronoi.cpp"
+				RelativePath=".\Area_Voronoi.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\AreaVoronoi.h"
+				RelativePath=".\Area_Voronoi.h"
 				>
 			</File>
 			<File

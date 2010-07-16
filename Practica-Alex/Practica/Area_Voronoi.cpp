@@ -1,6 +1,6 @@
 
 #include "StdAfx.h"
-#include "AreaVoronoi.h"
+#include "Area_Voronoi.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
