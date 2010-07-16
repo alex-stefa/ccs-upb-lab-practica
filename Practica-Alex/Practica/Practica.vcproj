@@ -363,14 +363,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\voronoi\vzdiagram.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\voronoi\vzdiagram.h"
-				>
-			</File>
-			<File
 				RelativePath=".\voronoi\vzgraphicsobj.cpp"
 				>
 			</File>
