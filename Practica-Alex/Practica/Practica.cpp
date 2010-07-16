@@ -65,7 +65,7 @@ int main(int argc, char* argv)
 		TRACE("%d ", (int) val);
 	}
 
-	TRACE("\Convex Hull:\n");
+	TRACE("\nConvex Hull:\n");
 	for (int i = 0; i < entities->GetSize(); ++i)
 	{
 		KGenericEntity* pEntity = (KGenericEntity*) entities->GetAt(i);

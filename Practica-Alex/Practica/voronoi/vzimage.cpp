@@ -27,6 +27,8 @@
 
 
 
+
+
 static QPoint GetCenter(const VzGraphicsObj* obj);
 
 

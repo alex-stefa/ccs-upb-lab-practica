@@ -37,7 +37,7 @@ KHistogram KFontSize::GetFontSizeHistogram(KEntityPointersArray& letters)
 	{
 		entity = (KEntity*) letters[i];
 		//entity->RebuildOBB();
-		heights.Add(entity->boundingRectangle.Height());
+		heights[i] = entity->boundingRectangle.Height();
 	}
 
 	return KHistogram(heights);

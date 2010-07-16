@@ -11,4 +11,5 @@ public:
 	static int FilterBySize(KEntityPointersArray& initialEntities, /*OUT*/ KEntityPointersArray& filteredEntities, 
 		float minWidth = 0, float minHeight = 0, float maxWidth = 0, float maxHeight = 0, bool deleteFiltered = false);
 	static void CopyEntityArray(KEntityPointersArray& initialEntities, /*OUT*/ KEntityPointersArray& copiedEntities);
+	static void GenerateEntityContours(KGenericEntity& entity, /*OUT*/ KPointSet& exteriorPoints, KPointSet& interiorPoints);
 };

@@ -50,13 +50,13 @@ const qreal EPS = 1.192092896e-07;
 const qreal sqrt3 = 1.732050808F;
 
 
-void VzVertex::dump() const
+void VzVertexDel::dump() const
 {
-    cout << "VzVertex: (" << point.x() << "," << point.y() << ")" << endl;
+    cout << "VzVertexDel: (" << point.x() << "," << point.y() << ")" << endl;
 }
 
 
-void VzTriangle::SetCircumCircle()
+void VzTriangleDel::SetCircumCircle()
 {
     qreal x0 = vertices[0]->GetX();
 	qreal y0 = vertices[0]->GetY();
@@ -131,9 +131,9 @@ void VzTriangle::SetCircumCircle()
 }
 
 
-void VzTriangle::dump() const
+void VzTriangleDel::dump() const
 {
-    cout << "######VzTriangle#####:" << endl;
+    cout << "######VzTriangleDel#####:" << endl;
     vertices[0]->dump();
     vertices[1]->dump();
     vertices[2]->dump();
@@ -147,23 +147,23 @@ void VzTriangle::dump() const
 class TriangleHasVertex
 {
 public:
-    TriangleHasVertex(const VzVertex superTriangle[3]) :
+    TriangleHasVertex(const VzVertexDel superTriangle[3]) :
         superTriangle(superTriangle)
     {
     }
 
-    bool operator() (const VzTriangle& tri) const
+    bool operator() (const VzTriangleDel& tri) const
     {
         for (int i = 0; i < 3; i++)
         {
-            const VzVertex* v = tri.GetVertex(i);
+            const VzVertexDel* v = tri.GetVertex(i);
             if (v >= superTriangle && v < (superTriangle + 3))
                 return true;
         }
         return false;
     }
 protected:
-    const VzVertex* superTriangle;
+    const VzVertexDel* superTriangle;
 };
 
 
@@ -180,14 +180,14 @@ class TriangleIsCompleted
 public:
     TriangleIsCompleted(VertexSet::const_iterator vIt,
                         TriangleSet& output,
-                        const VzVertex superTriangle[3])
+                        const VzVertexDel superTriangle[3])
         : vIt(vIt)
         , output(output)
         , superTriangle(superTriangle)
     {
     }
 
-    bool operator () (const VzTriangle& tri) const
+    bool operator () (const VzTriangleDel& tri) const
     {
         bool b = tri.IsLeftOf(vIt);
         if (b)
@@ -202,7 +202,7 @@ public:
 private:
     VertexSet::const_iterator vIt;
     TriangleSet& output;
-    const VzVertex* superTriangle;
+    const VzVertexDel* superTriangle;
 };
 
 
@@ -219,7 +219,7 @@ public:
     {
     }
 
-    bool operator () (const VzTriangle& tri) const
+    bool operator () (const VzTriangleDel& tri) const
     {
         bool b = tri.CCEncompasses(vIt);
         if (b)
@@ -232,10 +232,10 @@ public:
     }
 
 private:
-    void HandleEdge(const VzVertex* v1, const VzVertex* v2) const
+    void HandleEdge(const VzVertexDel* v1, const VzVertexDel* v2) const
     {
-        const VzVertex* pV1(0);
-        const VzVertex* pV2(0);
+        const VzVertexDel* pV1(0);
+        const VzVertexDel* pV2(0);
 
         // Create a normalized edge, in which the smallest vertex comes first.
 
@@ -250,7 +250,7 @@ private:
             pV2 = v1;
         }
 
-        VzEdge e(pV1, pV2);
+        VzEdgeDel e(pV1, pV2);
 
         // Check if this edge is already in the buffer
         EdgeSet::iterator found = edges.find(e);
@@ -265,9 +265,9 @@ private:
 };
 
 
-void VzEdge::dump() const
+void VzEdgeDel::dump() const
 {
-    cout << "########VzEdge#######:" << endl;
+    cout << "########VzEdgeDel#######:" << endl;
     v1->dump();
     v2->dump();
     cout << "######################" << endl;
@@ -316,13 +316,13 @@ void Delaunay::Triangulate(const VertexSet& vertices, TriangleSet& output)
 	// We could have made the 'super triangle' simply very big. However, the algorithm is quite sensitive to
 	// rounding errors, so it's better to make the 'super triangle' just big enough, like we do here.
 
-    VzVertex vSuper[3];
-    vSuper[0] = VzVertex(xMin - dy * sqrt3 / 3.0, yMin);
-    vSuper[1] = VzVertex(xMax + dy * sqrt3 / 3.0, yMin);
-    vSuper[2] = VzVertex((xMin + xMax) * 0.5, yMax + dx * sqrt3 * 0.5);
+    VzVertexDel vSuper[3];
+    vSuper[0] = VzVertexDel(xMin - dy * sqrt3 / 3.0, yMin);
+    vSuper[1] = VzVertexDel(xMax + dy * sqrt3 / 3.0, yMin);
+    vSuper[2] = VzVertexDel((xMin + xMax) * 0.5, yMax + dx * sqrt3 * 0.5);
 
     TriangleSet workset;
-    workset.insert(VzTriangle(vSuper));
+    workset.insert(VzTriangleDel(vSuper));
 
     for (vIt = vertices.begin(); vIt != vertices.end(); vIt++)
     {
@@ -360,7 +360,7 @@ void Delaunay::Triangulate(const VertexSet& vertices, TriangleSet& output)
 
         // Create new triangles from the edges and the current vertex.
         for (EdgeSet::iterator eIt = edges.begin(); eIt != edges.end(); eIt++) {
-            VzTriangle tri(eIt->v1, eIt->v2, &(*vIt));
+            VzTriangleDel tri(eIt->v1, eIt->v2, &(*vIt));
             workset.insert(tri);
         }
     }
@@ -386,10 +386,10 @@ void Delaunay::TrianglesToEdges(const TriangleSet& triangles, EdgeSet& edges)
 }
 
 
-void Delaunay::HandleEdge(const VzVertex* v1, const VzVertex* v2, EdgeSet& edges)
+void Delaunay::HandleEdge(const VzVertexDel* v1, const VzVertexDel* v2, EdgeSet& edges)
 {
-    const VzVertex* pV1 = 0;
-    const VzVertex* pV2 = 0;
+    const VzVertexDel* pV1 = 0;
+    const VzVertexDel* pV2 = 0;
 
     if (*v1 < *v2)
     {
@@ -403,7 +403,7 @@ void Delaunay::HandleEdge(const VzVertex* v1, const VzVertex* v2, EdgeSet& edges
     }
     // Insert a normalized edge. If it's already in edges, insertion will fail,
 	// thus leaving only unique edges.
-    edges.insert(VzEdge(pV1, pV2));
+    edges.insert(VzEdgeDel(pV1, pV2));
 
 }
 

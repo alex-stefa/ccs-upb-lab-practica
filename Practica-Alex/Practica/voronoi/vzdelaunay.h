@@ -34,13 +34,13 @@
 #define qreal float
 
 
-class VzPointF
+class VzPointDel
 {
 public:
-	VzPointF() : _x(0), _y(0) {}
-	VzPointF(qreal x, qreal y) : _x(x), _y(y) {}
-	VzPointF(const VzPointF& point) : _x(point._x), _y(point._y) {}
-	~VzPointF() {}
+	VzPointDel() : _x(0), _y(0) {}
+	VzPointDel(qreal x, qreal y) : _x(x), _y(y) {}
+	VzPointDel(const VzPointDel& point) : _x(point._x), _y(point._y) {}
+	~VzPointDel() {}
 
 	qreal x() const { return _x; }
 	qreal y() const { return _y; }
@@ -48,37 +48,37 @@ public:
 	void setX(qreal x) { _x = x; }
 	void setY(qreal y) { _y = y; }
 
-	bool operator==(VzPointF& point)  { return _x == point._x && _y == point._y; }
-	bool operator!=(VzPointF& point)  { return _x != point._x || _y != point._y;}
+	bool operator==(VzPointDel& point)  { return _x == point._x && _y == point._y; }
+	bool operator!=(VzPointDel& point)  { return _x != point._x || _y != point._y;}
 	
-	void operator+=(VzPointF point) { _x += point._x; _y += point._y; }
-	void operator-=(VzPointF point) { _x -= point._x; _y -= point._y; }
+	void operator+=(VzPointDel point) { _x += point._x; _y += point._y; }
+	void operator-=(VzPointDel point) { _x -= point._x; _y -= point._y; }
 
-	VzPointF operator+(const VzPointF point) const { return VzPointF(_x + point._x, _y + point._y); }
-	VzPointF operator-(const VzPointF point) const { return VzPointF(_x - point._x, _y - point._y); }
-	VzPointF operator-()  { return VzPointF(-_x, -_y); }
+	VzPointDel operator+(const VzPointDel point) const { return VzPointDel(_x + point._x, _y + point._y); }
+	VzPointDel operator-(const VzPointDel point) const { return VzPointDel(_x - point._x, _y - point._y); }
+	VzPointDel operator-()  { return VzPointDel(-_x, -_y); }
 
 private:
 	qreal _x, _y;
 };
 
 
-class VzVertex
+class VzVertexDel
 {
 public:
-    VzVertex()							: point(0, 0)                   {}
-    VzVertex(const VzVertex& vertex)    : point(vertex.point)           {}
-    VzVertex(const VzPointF& point)     : point(point)                  {}
-    VzVertex(qreal x, qreal y)          : point(x, y)                   {}
+    VzVertexDel()							: point(0, 0)                   {}
+    VzVertexDel(const VzVertexDel& vertex)    : point(vertex.point)           {}
+    VzVertexDel(const VzPointDel& point)      : point(point)                  {}
+    VzVertexDel(qreal x, qreal y)          : point(x, y)                   {}
 
-    bool operator < (const VzVertex& v) const
+    bool operator < (const VzVertexDel& v) const
     {
         if (point.x() == v.point.x())
             return point.y() < v.point.y();
         return point.x() < v.point.x();
     }
 
-    bool operator == (const VzVertex& v) const
+    bool operator == (const VzVertexDel& v) const
     {
         return point.x() == v.point.x() && point.y() == v.point.y();
     }
@@ -89,22 +89,22 @@ public:
     void SetX(int x)        { point.setX((qreal) x); }
     void SetY(int y)        { point.setY((qreal) y); }
 
-    const VzPointF& GetPoint() const { return point; }
+    const VzPointDel& GetPoint() const { return point; }
 
     void dump() const;
 
 private:
-    VzPointF point;
+    VzPointDel point;
 };
 
 
-typedef std::set<VzVertex> VertexSet;
+typedef std::set<VzVertexDel> VertexSet;
 
 
-class VzTriangle
+class VzTriangleDel
 {
 public:
-    VzTriangle(const VzVertex* p0, const VzVertex* p1, const VzVertex* p2)
+    VzTriangleDel(const VzVertexDel* p0, const VzVertexDel* p1, const VzVertexDel* p2)
     {
         vertices[0] = p0;
         vertices[1] = p1;
@@ -112,21 +112,21 @@ public:
         SetCircumCircle();
     }
 
-    VzTriangle(const VzVertex* pV)
+    VzTriangleDel(const VzVertexDel* pV)
     {
         for (int i = 0; i < 3; i++)
             vertices[i] = pV++;
         SetCircumCircle();
     }
 
-    bool operator < (const VzTriangle& tri) const
+    bool operator < (const VzTriangleDel& tri) const
     {
         if (center.x() == tri.center.x())
             return center.y() < tri.center.y();
         return center.x() < tri.center.x();
     }
 
-    const VzVertex* GetVertex(int i) const
+    const VzVertexDel* GetVertex(int i) const
     {
         ASSERT(i >= 0 && i < 3);
         return vertices[i];
@@ -142,12 +142,12 @@ public:
     // A vertex exactly on the circle is also considered to be in the circle.
     bool CCEncompasses(VertexSet::const_iterator vIt) const
     {
-        VzPointF dist = vIt->GetPoint() - center;
+        VzPointDel dist = vIt->GetPoint() - center;
         qreal dist2 = dist.x() * dist.x() + dist.y() * dist.y();
         return dist2 <= radius * radius;
     }
 
-    VzPointF GetCenter() const
+    VzPointDel GetCenter() const
     {
         return center;
     }
@@ -160,8 +160,8 @@ public:
     void dump() const;
 
 private:
-    const VzVertex* vertices[3];
-    VzPointF center;
+    const VzVertexDel* vertices[3];
+    VzPointDel center;
     qreal radius;
     qreal radius2;
 
@@ -170,18 +170,18 @@ private:
 
 
 
-typedef std::multiset<VzTriangle> TriangleSet;
+typedef std::multiset<VzTriangleDel> TriangleSet;
 
 
-class VzEdge
+class VzEdgeDel
 {
 public:
-    VzEdge(const VzVertex* v1, const VzVertex* v2) :
+    VzEdgeDel(const VzVertexDel* v1, const VzVertexDel* v2) :
         v1(v1), v2(v2)
     {
     }
 
-    bool operator < (const VzEdge& e) const
+    bool operator < (const VzEdgeDel& e) const
     {
         if (v1 == e.v1)
             return *v2 < *e.v2;
@@ -191,11 +191,11 @@ public:
     void dump() const;
 
 public:
-    const VzVertex* v1;
-    const VzVertex* v2;
+    const VzVertexDel* v1;
+    const VzVertexDel* v2;
 };
 
-typedef std::set<VzEdge> EdgeSet;
+typedef std::set<VzEdgeDel> EdgeSet;
 
 
 class Delaunay
@@ -208,7 +208,7 @@ public:
 	// This comes in useful for drawing the triangulation.
     void TrianglesToEdges(const TriangleSet& triangles, EdgeSet& edges);
 private:
-    void HandleEdge(const VzVertex* v1, const VzVertex* v2, EdgeSet& edges);
+    void HandleEdge(const VzVertexDel* v1, const VzVertexDel* v2, EdgeSet& edges);
 };
 
 

@@ -32,7 +32,7 @@
 
 
 #include "StdAfx.h"
-#include "vzdiagram.h"
+#include "vzvoronoi.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -756,7 +756,7 @@ void VoronoiDiagramGenerator::plotinit()
 void VoronoiDiagramGenerator::clip_line( VzEdge *e)
 {
 	VzSite *s1, *s2;
-	float x1=0,x2=0,y1=0,y2=0, temp = 0;;
+	float x1=0,x2=0,y1=0,y2=0, temp = 0;
 
 	x1 = e->reg[0]->coord.x;
 	x2 = e->reg[1]->coord.x;

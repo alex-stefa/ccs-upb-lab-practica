@@ -115,4 +115,106 @@ int KEntityUtils::FilterBySize(KEntityPointersArray& initialEntities, /*OUT*/ KE
 	return removed;
 }
 
+void KEntityUtils::GenerateEntityContours(KGenericEntity& entity, /*OUT*/ KPointSet& exteriorPoints, KPointSet& interiorPoints)
+{
+	KPageRectangle& BoundingRectangle = entity.boundingRectangle;
+
+	KPropValue val;
+	entity.GetPropertyValue(CCS_SEGMENTS, val);
+	KEntityPointersArray* Segments = (KEntityPointersArray*) (KPropertyInspector*) val;
+	ASSERT(Segments != NULL);
+
+	exteriorPoints.RemoveAll();
+	exteriorPoints.SetSize(0, 0x100);
+	interiorPoints.RemoveAll();
+	interiorPoints.SetSize(0, 0x100);
+
+	int intLastSegment = Segments->GetUpperBound();
+	ASSERT(intLastSegment >= 0);
+	if (intLastSegment < 0) return;
+
+	KPageCoordinate *intLastY = new KPageCoordinate[BoundingRectangle.right + 1];
+	KPageCoordinate *intLastA = new KPageCoordinate[BoundingRectangle.right + 1];
+	KPageCoordinate *intLastV = new KPageCoordinate[BoundingRectangle.right + 1];
+	memset(intLastY, 0xFF, (BoundingRectangle.right + 1) * sizeof(KPageCoordinate));
+	memset(intLastA, 0xFF, (BoundingRectangle.right + 1) * sizeof(KPageCoordinate));
+
+	KRowSegment *pRowSegment;
+	KPageCoordinate intStartColumn, intStopColumn, intX, intY;
+	int intSegment;
+
+	for (intSegment = 0; intSegment <= intLastSegment; intSegment++)
+	{
+		pRowSegment = (KRowSegment*) Segments->GetAt(intSegment);
+		intY = KPageCoordinate(pRowSegment->intRow);
+		intStartColumn = KPageCoordinate(pRowSegment->intStartColumn);
+		intStopColumn = KPageCoordinate(pRowSegment->intStopColumn);
+		for (intX = intStartColumn; intX <= intStopColumn; intX++)
+			intLastV[intX] = intY;
+	}
+
+	for (intSegment = 0; intSegment <= intLastSegment; intSegment++)
+	{
+		pRowSegment = (KRowSegment*) Segments->GetAt(intSegment);
+		intY = KPageCoordinate(pRowSegment->intRow);
+		intStartColumn = KPageCoordinate(pRowSegment->intStartColumn);
+		intStopColumn = KPageCoordinate(pRowSegment->intStopColumn);
+
+		if (intLastY[intStartColumn] != intLastA[intStartColumn] && intLastY[intStartColumn] < intY - 1)
+			interiorPoints.AddPoint(intStartColumn, intLastY[intStartColumn]);
+
+		if (intSegment == 0 || 
+			KPageCoordinate(((KRowSegment*) Segments->GetAt(intSegment - 1))->intRow) != intY || 
+			intLastY[intStartColumn] < 0 || 
+			intLastV[intStartColumn] == intY)
+			exteriorPoints.AddPoint(intStartColumn, intY);
+		else
+			interiorPoints.AddPoint(intStartColumn, intY);
+		intLastY[intStartColumn] = intLastA[intStartColumn] = intY;
+
+		if (intStartColumn != intStopColumn)
+		{
+			if (intLastY[intStopColumn] != intLastA[intStopColumn] && 
+				intLastY[intStopColumn] < intY - 1)
+				interiorPoints.AddPoint(intStopColumn, intLastY[intStopColumn]);
+
+			if (intSegment == intLastSegment || 
+				KPageCoordinate(((KRowSegment*) Segments->GetAt(intSegment + 1))->intRow) != intY || 
+				intLastY[intStopColumn] < 0 ||
+				intLastV[intStopColumn] == intY)
+				exteriorPoints.AddPoint(intStopColumn, intY);
+			else
+				interiorPoints.AddPoint(intStopColumn, intY);
+			intLastY[intStopColumn] = intLastA[intStopColumn] = intY;
+		}
+		else
+			continue;
+
+		for (intX = KPageCoordinate(intStartColumn + 1); intX < intStopColumn; intX++)
+		{
+			if (intLastY[intX] < 0)
+			{
+				exteriorPoints.AddPoint(intX, intY);
+				intLastA[intX] = intY;
+			}
+			else
+				if (intY - intLastY[intX] > 1)
+				{
+					if (intLastY[intX] != intLastA[intX])
+						interiorPoints.AddPoint(intX, intLastY[intX]);
+					interiorPoints.AddPoint(intX, intY);
+					intLastA[intX] = intY;
+				}
+			intLastY[intX] = intY;
+		}
+	}
+
+	for (intX = BoundingRectangle.left; intX <= BoundingRectangle.right; intX++)
+		if (intLastY[intX] != intLastA[intX])
+			exteriorPoints.AddPoint(intX, intLastY[intX]);  
+
+	delete [] intLastY;
+	delete [] intLastA;
+	delete [] intLastV;
+}
 
