@@ -363,6 +363,46 @@
 				>
 			</File>
 			<File
+				RelativePath=".\voronoi\vzdiagram.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\voronoi\vzdiagram.h"
+				>
+			</File>
+			<File
+				RelativePath=".\voronoi\vzgraphicsobj.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\voronoi\vzgraphicsobj.h"
+				>
+			</File>
+			<File
+				RelativePath=".\voronoi\vzimage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\voronoi\vzimage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\voronoi\vzmainwnd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\voronoi\vzmainwnd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\voronoi\vzmatrix.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\voronoi\vzmatrix.h"
+				>
+			</File>
+			<File
 				RelativePath=".\voronoi\vzvoronoi.cpp"
 				>
 				<FileConfiguration
