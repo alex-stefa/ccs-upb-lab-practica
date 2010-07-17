@@ -67,9 +67,9 @@ class VzVertexDel
 {
 public:
     VzVertexDel()							: point(0, 0)                   {}
-    VzVertexDel(const VzVertexDel& vertex)    : point(vertex.point)           {}
-    VzVertexDel(const VzPointDel& point)      : point(point)                  {}
-    VzVertexDel(qreal x, qreal y)          : point(x, y)                   {}
+    VzVertexDel(const VzVertexDel& vertex)  : point(vertex.point)           {}
+    VzVertexDel(const VzPointDel& point)    : point(point)                  {}
+    VzVertexDel(qreal x, qreal y)			: point(x, y)                   {}
 
     bool operator < (const VzVertexDel& v) const
     {

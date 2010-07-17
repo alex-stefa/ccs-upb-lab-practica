@@ -21,32 +21,58 @@ public:
 	float x, y;
 };
 
-class KVoronoiEdge
+class KVoronoiLine
 {
 public:
-	KVoronoiEdge(KVoronoiCell* cell1, KVoronoiCell* cell2, KVoronoiPoint& pt1, KVoronoiPoint& pt2) 
-		: cell1(cell1), cell2(cell2), pt1(pt1), pt2(pt2) 
-		{ ASSERT(cell1 != NULL); ASSERT(cell2 != NULL); }
+	KVoronoiLine(float x1, float y1, float x2, float y2) : pt1(x1, y1), pt2(x2, y2) {}
+	KVoronoiLine(KVoronoiPoint& pt1, KVoronoiPoint& pt2) : pt1(pt1), pt2(pt2) {}
 
-	~KVoronoiEdge() {}
+	~KVoronoiLine() {}
 
 	KVoronoiPoint pt1;
 	KVoronoiPoint pt2;
+};
+
+class KVoronoiEdge
+{
+public:
+	KVoronoiEdge(KVoronoiCell& cell1, KVoronoiCell& cell2) : cell1(&cell1), cell2(&cell2)
+	{
+		lines = new CArray<KVoronoiLine*, KVoronoiLine*>();
+	}
+
+	~KVoronoiEdge()
+	{ 
+		if (lines != NULL)
+		{
+			for (int i = 0; i < lines->GetSize(); ++i)
+				delete lines->GetAt(i);
+			delete lines;
+			lines == NULL;
+		}
+	}
+
 	KVoronoiCell* cell1;
 	KVoronoiCell* cell2;
+
+	CArray<KVoronoiLine*, KVoronoiLine*>* lines;
 };
 
 class KVoronoiCell
 {
 public:
-	KVoronoiCell(KGenericEntity* entity) 
-		: entity(entity)
-		{ ASSERT(entity != NULL); edges = new CArray<KVoronoiEdge*, KVoronoiEdge*>(); }
+	KVoronoiCell(KGenericEntity& entity) : entity(&entity) {}
 	
-	~KVoronoiCell() { delete edges; }
+	~KVoronoiCell()
+	{
+		for (std::map<KVoronoiCell*, KVoronoiEdge*>::iterator it = edges.begin(); it != edges.end(); ++it)
+			if (it->second->cell1 == this)
+				delete it->second;
+	}
 	
 	KGenericEntity* entity;
-	CArray<KVoronoiEdge*, KVoronoiEdge*>* edges;
+	
+	std::map<KVoronoiCell*, KVoronoiEdge*> edges;
 
 	KVoronoiPoint GetCenterPoint();
 };
@@ -54,20 +80,19 @@ public:
 class KAreaVoronoi
 {
 public:
-	KAreaVoronoi(KImage& image);
+	KAreaVoronoi(KEntityPointersArray& entities, int width, int height);
 	~KAreaVoronoi();
+
+	void GetEntities(/*OUT*/ KEntityPointersArray& entities);
+	int GetEntityCount();
 
 	void BuildAreaVoronoiDiagram(int sampleRate = 10, float voronoiMinDist = 2);
 	void BuildDelaunayDiagram();
 
-	void GetVoronoiCells(CArray<KVoronoiCell*, KVoronoiCell*>& cells);
-	void GetVoronoiEdges(CArray<KVoronoiEdge*, KVoronoiEdge*>& edges);
+	void GetVoronoiCells(/*OUT*/ CArray<KVoronoiCell*, KVoronoiCell*>& cells);
 
 private:
 	int width, height;
-	KImagePage* pImgPage;
-	KHash2D* hash;
 	std::map<KGenericEntity*, KVoronoiCell*> cellMap;	
 	CArray<KVoronoiCell*, KVoronoiCell*>* voronoiCells;
-	CArray<KVoronoiEdge*, KVoronoiEdge*>* voronoiEdges;
 };

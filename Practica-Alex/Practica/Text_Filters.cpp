@@ -28,7 +28,7 @@ using namespace std;
 bool KTextFilters::DebugEnabled = false;
 char* KTextFilters::DebugOutputPath = ".\\";
 char* KTextFilters::DebugFilenamePrefix = "text-filters";
-KEntityPointersArray* KTextFilters::toDelete = new KEntityPointersArray();
+KEntityPointersArray* KTextFilters::toDelete = NULL;
 
 
 //! Returns number of pixels inside a level0 entity (seems KEntity.intNumberOfPixels is never assigned!)
