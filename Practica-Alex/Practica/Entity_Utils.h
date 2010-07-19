@@ -39,9 +39,9 @@ public:
 	KGenericEntity* GetEntityAtPixel(CPoint& point);
 
 	void GetEntities(/*OUT*/ KEntityPointersArray& entities);
-	void GetEntities(CRect& rect, /*OUT*/ KEntityPointersArray& entities);
+	void GetEntities(CRect& rect, /*OUT*/ KEntityPointersArray& entities, bool containedInRect = false);
 	int GetEntityCount();
-	int GetEntityCount(CRect& rect);
+	int GetEntityCount(CRect& rect, bool containedInRect = false);
 
 	const enum VicinityMode { CONNECTED_4 = 1, CONNECTED_8 = 2 };
 	void GetContourPoints(/*OUT*/ CArray<CPoint, CPoint>& contour, VicinityMode vicinityMode = KEntityPixelMapper::CONNECTED_8);

@@ -370,7 +370,7 @@ KGenericEntity* KEntityPixelMapper::GetEntityAtPixel(CPoint& point)
 	return GetEntityAtPixel((int) point.x, (int) point.y);
 }
 
-void KEntityPixelMapper::GetEntities(CRect& rect, /*OUT*/ KEntityPointersArray& entities)
+void KEntityPixelMapper::GetEntities(CRect& rect, /*OUT*/ KEntityPointersArray& entities, bool containedInRect)
 {
 	int left = min(rect.left, rect.right);
 	int right = max(rect.left, rect.right);
@@ -384,21 +384,36 @@ void KEntityPixelMapper::GetEntities(CRect& rect, /*OUT*/ KEntityPointersArray& 
 	top = max(0, top);
 	bottom = min(height, bottom);
 
-	set<short> indices;
-
-	for (int row = top; row <= bottom; ++row)
-		for (int column = left; column <= right; ++column)
-			if (map[row][column] != unmapped)
-				indices.insert(map[row][column]);
-
-	entities.RemoveAll();
-	entities.SetSize(indices.size());
-
-	int count = 0;
-	for (set<short>::iterator it = indices.begin(); it != indices.end(); ++it)
+	if (!containedInRect)
 	{
-		ASSERT(*it >= 0 && *it < mappedEntities->GetSize());
-		entities[count++] = mappedEntities->GetAt(*it);
+		set<short> indices;
+
+		for (int row = top; row <= bottom; ++row)
+			for (int column = left; column <= right; ++column)
+				if (map[row][column] != unmapped)
+					indices.insert(map[row][column]);
+
+		entities.RemoveAll();
+		entities.SetSize(indices.size());
+
+		int count = 0;
+		for (set<short>::iterator it = indices.begin(); it != indices.end(); ++it)
+		{
+			ASSERT(*it >= 0 && *it < mappedEntities->GetSize());
+			entities[count++] = mappedEntities->GetAt(*it);
+		}
+	}
+	else
+	{
+		entities.RemoveAll();
+		KPageRectangle pageRect(left, right, top, bottom);
+		KGenericEntity* entity;
+		for (int i = 0; i < mappedEntities->GetSize(); ++i)
+		{
+			entity = (KGenericEntity*) mappedEntities->GetAt(i);
+			if (pageRect.Include(entity->boundingRectangle))
+				entities.Add(entity);
+		}
 	}
 }
 
@@ -407,10 +422,10 @@ void KEntityPixelMapper::GetEntities(/*OUT*/ KEntityPointersArray& entities)
 	KEntityUtils::CopyEntityArray(*mappedEntities, entities);
 }
 
-int KEntityPixelMapper::GetEntityCount(CRect& rect)
+int KEntityPixelMapper::GetEntityCount(CRect& rect, bool containedInRect)
 {
 	KEntityPointersArray* temp = new KEntityPointersArray();
-	GetEntities(rect, *temp);
+	GetEntities(rect, *temp, containedInRect);
 	int size = temp->GetSize();
 	delete temp;
 	return size;

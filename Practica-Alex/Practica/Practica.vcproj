@@ -355,6 +355,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\vzdefs.h"
+				>
+			</File>
+			<File
 				RelativePath=".\voronoi\vzdelaunay.cpp"
 				>
 			</File>
