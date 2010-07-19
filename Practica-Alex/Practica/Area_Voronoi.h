@@ -3,8 +3,10 @@
 #pragma once
 
 #include "Entity_Utils.h"
+#include "Image_Utils.h"
 #include "voronoi/vzvoronoi.h"
 #include "voronoi/vzdelaunay.h"
+#include "../KImage/Iterators.h"
 #include <map>
 
 class KAreaVoronoi
@@ -107,6 +109,10 @@ public:
 
 	void BuildAreaVoronoiDiagram(int sampleRate = 10, float voronoiMinDist = 2);
 	void BuildDelaunayDiagram();
+
+	void GetEntities(/*OUT*/ KEntityPointersArray& entities);
+
+	void DrawVoronoiDiagram(KImage& image, KRGBColor& edgeColor = KRGBColor(0, 0, 0));
 
 	KVoronoiCell* MergeCells(int index1, int index2);
 

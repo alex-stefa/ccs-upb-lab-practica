@@ -189,13 +189,50 @@ KAreaVoronoi::KVoronoiCell* KAreaVoronoi::MergeCells(int index1, int index2)
 			merged_cell->edges[other_cell] = mov_edge;
 			other_cell->edges.erase(removed_cell);
 			other_cell->edges[merged_cell] = mov_edge;
-			mov_edge->cell1 = other_cell;
-			mov_edge->cell2 = merged_cell;
+			if (mov_edge->cell1 == removed_cell) 
+				mov_edge->cell1 == merged_cell;
+			else
+				mov_edge->cell2 == merged_cell;
 			rem_it = removed_cell->edges.erase(rem_it);
 		}
 	}
 
 	delete removed_cell;
+}
+
+
+void KAreaVoronoi::GetEntities(/*OUT*/ KEntityPointersArray& entities)
+{
+	entities.RemoveAll();
+	entities.SetSize(voronoiCells->GetSize());
+	for (int i = 0; i < voronoiCells->GetSize(); ++i)
+		entities[i] = voronoiCells->GetAt(i)->entity;
+}
+
+
+void KAreaVoronoi::DrawVoronoiDiagram(KImage& image, KRGBColor& edgeColor)
+{
+	KEntityPointersArray* entities = new KEntityPointersArray();
+	GetEntities(*entities);
+	KEntityDrawing::DrawEntityArray(image, *entities, KEntityDrawing::ENTITY_PIXELS);
+
+	image.BeginDirectAccess(true);
+
+	for (int i = 0; i < voronoiCells->GetSize(); ++i)
+	{
+		KVoronoiCell* cell = voronoiCells->GetAt(i);
+		for (KVoronoiCell::EdgeMap::iterator it = cell->edges.begin(); it != cell->edges.end(); ++it)
+			if (it->second->cell1 = cell)
+				for (int j = it->second->lines->GetSize()-1; j >= 0; --j)
+				{
+					KVoronoiLine* line = it->second->lines->GetAt(j);
+					KIterators::BresenhamLineIterator(
+						line->point1.x, line->point1.y, line->point2.x, line->point2.y, 
+						__KIterators__Put24BPPPixel, &image, &edgeColor);
+				}
+	}
+
+	image.EndDirectAccess();
 }
 
 
@@ -251,28 +288,3 @@ float KAreaVoronoi::KVoronoiCell::GetMinDistance()
 //    return rEdges;
 //
 //}
-
-
-//void KAreaVoronoi::GetVoronoiCells(/*OUT*/ CArray<KVoronoiCell*, KVoronoiCell*>& cells)
-//{
-//	cells.RemoveAll();
-//	cells.SetSize(voronoiCells->GetSize());
-//	for (int i = 0; i < voronoiCells->GetSize(); ++i)
-//		cells[i] = voronoiCells->GetAt(i);
-//}
-
-
-//void KAreaVoronoi::GetEntities(/*OUT*/ KEntityPointersArray& entities)
-//{
-//	entities.RemoveAll();
-//	entities.SetSize(voronoiCells->GetSize());
-//	for (int i = 0; i < voronoiCells->GetSize(); ++i)
-//		entities[i] = &(voronoiCells->GetAt(i)->GetEntity());
-//}
-//
-//
-//int KAreaVoronoi::GetEntityCount()
-//{
-//	return voronoiCells->GetSize();
-//}
-

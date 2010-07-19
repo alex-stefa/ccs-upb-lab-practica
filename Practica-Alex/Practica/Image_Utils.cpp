@@ -96,7 +96,7 @@ void KEntityDrawing::DrawEntityArray(KImage& image, KEntityPointersArray& entiti
 
 	KRGBColor drawColor;
 
-	if (drawMode | (int) KEntityDrawing::ENTITY_PIXELS) 
+	if (drawMode & (int) KEntityDrawing::ENTITY_PIXELS) 
 	{
 		for (int i = 0; i < entities.GetSize(); ++i)
 		{
@@ -105,7 +105,7 @@ void KEntityDrawing::DrawEntityArray(KImage& image, KEntityPointersArray& entiti
 			DrawEntity(image, *entity, &drawColor, true);
 		}
 	}
-	if (drawMode | (int) KEntityDrawing::BOUNDING_RECTANGLE)
+	if (drawMode & (int) KEntityDrawing::BOUNDING_RECTANGLE)
 	{
 		for (int i = 0; i < entities.GetSize(); ++i)
 		{
