@@ -50,7 +50,8 @@ int main(int argc, char* argv)
 	//outImg.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-ent.tif"));
 
 	//KTextFilters::FilterLetters(*entities);
-	//
+	//TRACE("Entity count: %d\n", entities->GetSize());
+	
 	//KImage outImg2(pTestImg->GetPixelSize(), 24);
 	//outImg2.Invert();
 	//KEntityDrawing::DrawEntityArray(outImg2, *entities, KEntityDrawing::BOUNDING_RECTANGLE + KEntityDrawing::ENTITY_PIXELS);
@@ -80,7 +81,7 @@ int main(int argc, char* argv)
 	KAreaVoronoi* voronoize = new KAreaVoronoi(*entities, pTestImg->GetPixelWidth(), pTestImg->GetPixelHeight());
 	voronoize->BuildAreaVoronoiDiagram();
 	TRACE("Voronoi Cells: %d\n", voronoize->GetCellCount());
-	KImage outImg3(pTestImg->GetPixelSize() + CSize(1, 1), 24);
+	KImage outImg3(pTestImg->GetPixelSize(), 24);
 	outImg3.Invert();
 	voronoize->DrawVoronoiDiagram(outImg3);
 	outImg3.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-voronoi.tif"));

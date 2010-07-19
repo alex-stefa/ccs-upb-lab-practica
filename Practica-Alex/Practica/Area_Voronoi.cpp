@@ -64,12 +64,15 @@ void KAreaVoronoi::BuildAreaVoronoiDiagram(int sampleRate, float voronoiMinDist)
 	KEntityPixelMapper* mapper = new KEntityPixelMapper(width, height);
 
 	for (int i = 0; i < voronoiCells->GetSize(); ++i)
-		mapper->AddEntity(*(voronoiCells->GetAt(i)->entity));
+	{
+		KGenericEntity* entity = voronoiCells->GetAt(i)->entity;
+		mapper->AddEntity(*entity);
+	}
 
 	CArray<CPoint, CPoint>* contour = new CArray<CPoint, CPoint>();
 	mapper->GetContourPoints(*contour, KEntityPixelMapper::CONNECTED_8);
 
-	TRACE("\nContour points: %d\n", contour->GetSize());
+	//TRACE("\nContour points: %d\n", contour->GetSize());
 
 	int size = contour->GetSize() / sampleRate;
 	float* x = new float[size];
@@ -209,6 +212,8 @@ void KAreaVoronoi::GetEntities(/*OUT*/ KEntityPointersArray& entities)
 		entities[i] = voronoiCells->GetAt(i)->entity;
 }
 
+#define VALID_W(x) max(0.0f, min(x, width-1))
+#define VALID_H(x) max(0.0f, min(x, height-1))
 
 void KAreaVoronoi::DrawVoronoiDiagram(KImage& image, KRGBColor& edgeColor)
 {
@@ -227,7 +232,8 @@ void KAreaVoronoi::DrawVoronoiDiagram(KImage& image, KRGBColor& edgeColor)
 				{
 					KVoronoiLine* line = it->second->lines->GetAt(j);
 					KIterators::BresenhamLineIterator(
-						line->point1.x, line->point1.y, line->point2.x, line->point2.y, 
+						VALID_W(line->point1.x), VALID_H(line->point1.y), 
+						VALID_W(line->point2.x), VALID_H(line->point2.y), 
 						__KIterators__Put24BPPPixel, &image, &edgeColor);
 				}
 	}
