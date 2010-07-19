@@ -21,6 +21,7 @@ int main(int argc, char* argv)
 	clock_t start_time = clock();
 
 	KImage* pTestImg = new KImage(CString("..\\Test_Images\\input\\01BPP.tif"), NULL);
+	//KImage* pTestImg = new KImage(CString("..\\Test_Images\\input\\01BPP2.tif"), NULL);
 	ASSERT(pTestImg->IsBitonal());
 
 	KImagePage* pImgPage = new KImagePage(pTestImg);
@@ -49,8 +50,9 @@ int main(int argc, char* argv)
 	//KEntityDrawing::DrawEntityArray(outImg, *entities, KEntityDrawing::BOUNDING_RECTANGLE + KEntityDrawing::ENTITY_PIXELS);
 	//outImg.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-ent.tif"));
 
-	//KTextFilters::FilterLetters(*entities);
-	//TRACE("Entity count: %d\n", entities->GetSize());
+	TRACE("Initial Entity count: %d\n", entities->GetSize());
+	KTextFilters::FilterLetters(*entities);
+	TRACE("Merged Entity count: %d\n", entities->GetSize());
 	
 	//KImage outImg2(pTestImg->GetPixelSize(), 24);
 	//outImg2.Invert();
@@ -76,8 +78,6 @@ int main(int argc, char* argv)
 	//	TRACE("%d ", hull->GetSize());
 	//}
 
-	//KTextFilters::DoCleanup();
-
 	KAreaVoronoi* voronoize = new KAreaVoronoi(*entities, pTestImg->GetPixelWidth(), pTestImg->GetPixelHeight());
 	voronoize->BuildAreaVoronoiDiagram();
 	TRACE("Voronoi Cells: %d\n", voronoize->GetCellCount());
@@ -85,9 +85,11 @@ int main(int argc, char* argv)
 	outImg3.Invert();
 	voronoize->DrawVoronoiDiagram(outImg3);
 	outImg3.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-voronoi.tif"));
+	//outImg3.WriteImage(CString("..\\Test_Images\\input\\01BPP2-test-voronoi.tif"));
 
 	delete voronoize;
 
+	KTextFilters::DoCleanup();
 
 	delete pImgPage;
 	delete entities;
