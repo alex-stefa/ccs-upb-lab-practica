@@ -201,6 +201,7 @@ KAreaVoronoi::KVoronoiCell* KAreaVoronoi::MergeCells(int index1, int index2)
 	}
 
 	delete removed_cell;
+	return merged_cell;
 }
 
 
