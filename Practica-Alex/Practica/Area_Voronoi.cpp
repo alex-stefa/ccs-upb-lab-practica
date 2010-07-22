@@ -156,7 +156,7 @@ KAreaVoronoi::KVoronoiCell* KAreaVoronoi::MergeCells(KVoronoiCell& vcell1, KVoro
 
 	if (edge_it1 == cell1->edges.end() || edge_it2 == cell2->edges.end()) return NULL;
 
-	ASSERT(*edge_it1 == *edge_it2);
+	ASSERT(edge_it1->second == edge_it2->second);
 
 	KVoronoiEdge* common_edge = edge_it1->second;
 
@@ -204,9 +204,9 @@ KAreaVoronoi::KVoronoiCell* KAreaVoronoi::MergeCells(KVoronoiCell& vcell1, KVoro
 			other_cell->edges.erase(removed_cell);
 			other_cell->edges[merged_cell] = mov_edge;
 			if (mov_edge->cell1 == removed_cell) 
-				mov_edge->cell1 == merged_cell;
+				mov_edge->cell1 = merged_cell;
 			else
-				mov_edge->cell2 == merged_cell;
+				mov_edge->cell2 = merged_cell;
 			rem_it = removed_cell->edges.erase(rem_it);
 		}
 	}
