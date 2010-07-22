@@ -135,10 +135,21 @@ void KAreaVoronoi::BuildAreaVoronoiDiagram(int sampleRate, float voronoiMinDist)
 	delete mapper;
 }
 
-KAreaVoronoi::KVoronoiCell* KAreaVoronoi::MergeCells(int index1, int index2)
+KAreaVoronoi::KVoronoiCell* KAreaVoronoi::MergeCells(KVoronoiCell& vcell1, KVoronoiCell& vcell2)
 {
-	KVoronoiCell* cell1 = voronoiCells->GetAt(index1);
-	KVoronoiCell* cell2 = voronoiCells->GetAt(index2);
+	int index1 = -1;
+	int index2 = -1;
+
+	KVoronoiCell* cell1 =  &vcell1;
+	KVoronoiCell* cell2 =  &vcell2;
+	if (cell1 == cell2) return cell1;
+
+	for (int i = 0; i < voronoiCells->GetSize(); ++i)
+	{
+		if (voronoiCells->GetAt(i) == cell1) index1 = i;
+		if (voronoiCells->GetAt(i) == cell2) index2 = i;
+	}
+	if (index1 < 0 || index2 < 0) return NULL;
 
 	KVoronoiCell::EdgeMap::iterator edge_it1 = cell1->edges.find(cell2);
 	KVoronoiCell::EdgeMap::iterator edge_it2 = cell2->edges.find(cell1);

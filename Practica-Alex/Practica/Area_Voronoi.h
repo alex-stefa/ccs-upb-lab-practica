@@ -114,7 +114,7 @@ public:
 
 	void DrawVoronoiDiagram(KImage& image, KRGBColor& edgeColor = KRGBColor(0, 0, 0));
 
-	KVoronoiCell* MergeCells(int index1, int index2);
+	KVoronoiCell* MergeCells(KVoronoiCell& vcell1, KVoronoiCell& vcell2);
 
 	inline int GetCellCount() { return voronoiCells->GetSize(); }
 	inline KVoronoiCell& GetCell(int index) { return *(voronoiCells->GetAt(index)); }
