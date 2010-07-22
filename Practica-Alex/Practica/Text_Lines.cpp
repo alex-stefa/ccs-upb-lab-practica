@@ -66,7 +66,7 @@ void KTextLines::BuildLines(KEntityPointersArray& letters, /*OUT*/ KEntityPointe
 	mediumEntities->RemoveAll();
 
 	float local_avg_width, local_max_height, epsi;
-	float vert_ext, horiz_ext, max_gap;
+	float vert_ext, light_vert_ext, horiz_ext, light_horiz_ext, max_gap;
 	int center_level;
 	KGenericEntity* seed;
 	KEntityCollection* line;
@@ -98,16 +98,18 @@ void KTextLines::BuildLines(KEntityPointersArray& letters, /*OUT*/ KEntityPointe
 
 			center_level = curr_rect.top + curr_rect.Height() / 2;
 			vert_ext = 0.75f * local_max_height * epsi;
+			light_vert_ext = 0.2f * local_max_height;
+			light_horiz_ext = 0.75f * local_avg_width;
 			horiz_ext = max(5.0f * local_avg_width, 2.5f * local_max_height);
-			max_gap = max(2.0f * local_avg_width, 1.5f * local_max_height);
+			max_gap = max(2.0f * local_avg_width, 1.25f * local_max_height);
 
 			left_rect.left = curr_rect.left - horiz_ext;
-			left_rect.right = curr_rect.left;
+			left_rect.right = curr_rect.left + light_horiz_ext;
 			left_rect.top = curr_rect.top - vert_ext;
 			left_rect.bottom = curr_rect.bottom + vert_ext;
 
 			right_rect.right = curr_rect.right + horiz_ext;
-			right_rect.left = curr_rect.right;
+			right_rect.left = curr_rect.right - light_horiz_ext;
 			right_rect.top = curr_rect.top - vert_ext;
 			right_rect.bottom = curr_rect.bottom + vert_ext;
 
@@ -116,8 +118,8 @@ void KTextLines::BuildLines(KEntityPointersArray& letters, /*OUT*/ KEntityPointe
 			{
 				KPageRectangle& ent_rect = (*ent_it)->boundingRectangle;
 
-				if ((ent_rect.top > center_level && ent_rect.bottom > (curr_rect.bottom + 0.2f * local_max_height)) ||
-					(ent_rect.bottom < center_level && ent_rect.top < (curr_rect.top - 0.2f * local_max_height)))
+				if ((ent_rect.top > center_level && ent_rect.bottom > (curr_rect.bottom + light_vert_ext)) ||
+					(ent_rect.bottom < center_level && ent_rect.top < (curr_rect.top - light_vert_ext)))
 				{
 					++ent_it;
 					continue;

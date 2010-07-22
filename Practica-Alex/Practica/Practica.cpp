@@ -21,8 +21,8 @@ int main(int argc, char* argv)
 {
 	clock_t start_time = clock();
 
-	KImage* pTestImg = new KImage(CString("..\\Test_Images\\input\\01BPP.tif"), NULL);
-	//KImage* pTestImg = new KImage(CString("..\\Test_Images\\input\\01BPP2.tif"), NULL);
+	//KImage* pTestImg = new KImage(CString("..\\Test_Images\\input\\01BPP.tif"), NULL);
+	KImage* pTestImg = new KImage(CString("..\\Test_Images\\input\\01BPP2.tif"), NULL);
 	ASSERT(pTestImg->IsBitonal());
 
 	KImagePage* pImgPage = new KImagePage(pTestImg);
@@ -52,7 +52,7 @@ int main(int argc, char* argv)
 	//outImg.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-ent.tif"));
 
 	TRACE("Initial Entity count: %d\n", entities->GetSize());
-	KTextFilters::FilterLetters(*entities);
+	//KTextFilters::FilterLetters(*entities);
 	TRACE("Merged Entity count: %d\n", entities->GetSize());
 	
 	//KImage outImg2(pTestImg->GetPixelSize(), 24);
@@ -96,8 +96,8 @@ int main(int argc, char* argv)
 	KImage outImg4(pTestImg->GetPixelSize(), 24);
 	outImg4.Invert();
 	KEntityDrawing::DrawEntityArray(outImg4, *lines, KEntityDrawing::ENTITY_PIXELS + KEntityDrawing::BOUNDING_RECTANGLE);
-	outImg4.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-lines.tif"));
-	//outImg4.WriteImage(CString("..\\Test_Images\\input\\01BPP2-test-lines.tif"));
+	//outImg4.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-lines.tif"));
+	outImg4.WriteImage(CString("..\\Test_Images\\input\\01BPP2-test-lines.tif"));
 	delete lines;
 	KTextLines::DoCleanup();
 
