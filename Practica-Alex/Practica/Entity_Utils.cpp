@@ -76,6 +76,19 @@ void KEntityUtils::CopyEntityArray(KEntityPointersArray& initialEntities, /*OUT*
 		copiedEntities[i] = initialEntities[i];
 }
 
+void KEntityUtils::AppendEntityArray(KEntityPointersArray& sourceEntities, /*OUT*/ KEntityPointersArray& destinationEntities)
+{
+	if (sourceEntities.GetSize() <= 0) return;
+
+	int src_size = sourceEntities.GetSize();
+	int dest_size = destinationEntities.GetSize();
+
+	destinationEntities.SetSize(dest_size + src_size);
+
+	for (int i = 0; i < src_size; ++i)
+		destinationEntities[dest_size + i] = sourceEntities[i];
+}
+
 int KEntityUtils::FilterBySize(KEntityPointersArray& initialEntities, /*OUT*/ KEntityPointersArray& filteredEntities, 
 		float minWidth, float minHeight, float maxWidth, float maxHeight, bool deleteFiltered)
 {

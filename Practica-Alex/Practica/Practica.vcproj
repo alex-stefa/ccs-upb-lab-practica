@@ -342,6 +342,14 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\Text_Lines.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Text_Lines.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Voronoi"

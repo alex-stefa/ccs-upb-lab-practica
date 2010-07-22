@@ -14,11 +14,6 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace std;
 
-#define LEVEL0_CHECK(letters) \
-	if (letters.GetSize() == 0) return KEntityPointersArray(); \
-	CString* baseType = letters[0]->GetDirectBaseType(); \
-	if (baseType && *baseType != CCS_LEVEL0) \
-	{ TRACE("Input entities are not LEVEL0 type!\n");  ASSERT(false); return KEntityPointersArray(); } 
 
 #define MARK_DELETE(pEntity) \
 	if (KTextFilters::toDelete == NULL) KTextFilters::toDelete = new KEntityPointersArray(); \
@@ -30,21 +25,6 @@ char* KTextFilters::DebugOutputPath = ".\\";
 char* KTextFilters::DebugFilenamePrefix = "text-filters";
 KEntityPointersArray* KTextFilters::toDelete = NULL;
 
-
-//! Returns number of pixels inside a level0 entity (seems KEntity.intNumberOfPixels is never assigned!)
-static int NumberOfPixels(KEntity& entity)
-{
-	KRowSegment* segment;
-	int pixelCount = 0;
-
-	for (int i = entity.GetNumberOfSegments()-1; i >= 0; --i)
-	{
-		segment = entity.Segment(i);
-		pixelCount += abs(segment->intStopColumn - segment->intStartColumn) + 1;
-	}
-
-	return pixelCount;
-}
 
 void KTextFilters::DoCleanup()
 {
@@ -105,8 +85,6 @@ void KTextFilters::InsideFilter(KEntityPointersArray& initialEntities,
 void KTextFilters::FilterLetters(KEntityPointersArray& letters, 
 		bool useWidthFilter, bool useInsideFilter, bool useMergeFilter)
 {
-	//LEVEL0_CHECK(letters);
-
 	if (letters.GetSize() <= 0) return;
 
 	if (useInsideFilter) InsideFilter(letters, letters);

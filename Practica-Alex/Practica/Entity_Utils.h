@@ -18,6 +18,8 @@ public:
 	
 	static void CopyEntityArray(KEntityPointersArray& initialEntities, 
 		/*OUT*/ KEntityPointersArray& copiedEntities);
+	static void AppendEntityArray(KEntityPointersArray& sourceEntities, 
+		/*OUT*/ KEntityPointersArray& destinationEntities);
 	
 	static void GenerateEntityContours(KGenericEntity& entity, 
 		/*OUT*/ KPointSet& exteriorPoints, KPointSet& interiorPoints);

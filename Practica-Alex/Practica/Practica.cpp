@@ -7,6 +7,7 @@
 #include "Image_Utils.h"
 #include "Entity_Utils.h"
 #include "Text_Filters.h"
+#include "Text_Lines.h"
 #include "Area_Voronoi.h"
 
 #ifdef _DEBUG
@@ -78,16 +79,27 @@ int main(int argc, char* argv)
 	//	TRACE("%d ", hull->GetSize());
 	//}
 
-	KAreaVoronoi* voronoize = new KAreaVoronoi(*entities, pTestImg->GetPixelWidth(), pTestImg->GetPixelHeight());
-	voronoize->BuildAreaVoronoiDiagram();
-	TRACE("Voronoi Cells: %d\n", voronoize->GetCellCount());
-	KImage outImg3(pTestImg->GetPixelSize(), 24);
-	outImg3.Invert();
-	voronoize->DrawVoronoiDiagram(outImg3);
-	outImg3.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-voronoi.tif"));
-	//outImg3.WriteImage(CString("..\\Test_Images\\input\\01BPP2-test-voronoi.tif"));
+	//KAreaVoronoi* voronoize = new KAreaVoronoi(*entities, pTestImg->GetPixelWidth(), pTestImg->GetPixelHeight());
+	//voronoize->BuildAreaVoronoiDiagram();
+	//TRACE("Voronoi Cells: %d\n", voronoize->GetCellCount());
+	//KImage outImg3(pTestImg->GetPixelSize(), 24);
+	//outImg3.Invert();
+	//voronoize->DrawVoronoiDiagram(outImg3);
+	//outImg3.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-voronoi.tif"));
+	////outImg3.WriteImage(CString("..\\Test_Images\\input\\01BPP2-test-voronoi.tif"));
 
-	delete voronoize;
+	//delete voronoize;
+
+	KEntityPointersArray* lines = new KEntityPointersArray();
+	KTextLines::BuildLines(*entities, *lines);
+	TRACE("Text Lines: %d\n", lines->GetSize());
+	KImage outImg4(pTestImg->GetPixelSize(), 24);
+	outImg4.Invert();
+	KEntityDrawing::DrawEntityArray(outImg4, *lines, KEntityDrawing::ENTITY_PIXELS + KEntityDrawing::BOUNDING_RECTANGLE);
+	outImg4.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-lines.tif"));
+	//outImg4.WriteImage(CString("..\\Test_Images\\input\\01BPP2-test-lines.tif"));
+	delete lines;
+	KTextLines::DoCleanup();
 
 	KTextFilters::DoCleanup();
 
