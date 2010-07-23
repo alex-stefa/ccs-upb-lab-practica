@@ -90,12 +90,12 @@ void KTextLines::BuildLines(KEntityPointersArray& letters, /*OUT*/ KEntityPointe
 			right_found = false;
 
 			KPageRectangle& curr_rect = line->boundingRectangle;
-			local_avg_width = curr_rect.Width() / children;
-
+			
 			//epsi = max(0.1f, 1.1f - 0.1f * children);
 			epsi = 1.0f;
 			if (curr_rect.Height() > 2 * local_max_height) epsi = 0.1f;
 
+			local_avg_width = curr_rect.Width() / children;
 			center_level = curr_rect.top + curr_rect.Height() / 2;
 			vert_ext = 0.75f * local_max_height * epsi;
 			light_vert_ext = 0.2f * local_max_height;

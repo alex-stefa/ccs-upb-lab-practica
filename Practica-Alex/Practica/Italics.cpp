@@ -11,12 +11,6 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-#define LEVEL0_CHECK(letters) \
-	if (letters.GetSize() == 0) return 0; \
-	CString* baseType = letters[0]->GetDirectBaseType(); \
-	if (baseType && *baseType != CCS_LEVEL0) \
-	{ TRACE("Input entities are not LEVEL0 type!\n");  ASSERT(false); return 0; } 
-
 
 //! Rotates a point in a plane relative to specified origin
 static void RotatePoint(KPagePoint& point, float xOrigin, float yOrigin, float sinVal, float cosVal, 
@@ -30,18 +24,20 @@ static void RotatePoint(KPagePoint& point, float xOrigin, float yOrigin, float s
 }
 
 
-//! Creates a black image the size of the given level0 entity and sets the entity pixels to white
-static KImage BuildImage(KEntity& entity)
+//! Creates a black image the size of the given entity and sets the entity pixels to white
+static KImage BuildImage(KGenericEntity& entity)
 {
-	//entity.RebuildOBB();
-	//entity.RebuildSegments();
-
 	KImage img(CSize(entity.boundingRectangle.Width(), entity.boundingRectangle.Height()), 1);
 
+	KPropValue propValue;
+	entity.GetPropertyValue(CCS_SEGMENTS, propValue);
+	KEntityPointersArray* pSegments = (KEntityPointersArray*)(KPropertyInspector*) propValue;
+	ASSERT(pSegments != NULL);
+
 	KRowSegment* segment;
-	for (int i = entity.GetNumberOfSegments()-1; i >= 0; --i)
+	for (int i = pSegments->GetUpperBound(); i >= 0; --i)
 	{
-		segment = entity.Segment(i);
+		segment = (KRowSegment*) (pSegments->GetAt(i));
 		img.Fill(PixelRect(
 					segment->intStartColumn - entity.boundingRectangle.left, 
 					segment->intRow - entity.boundingRectangle.top,
@@ -106,7 +102,7 @@ Return: percentage of italic entities in the array
 */
 double KItalics::WidthMethod(KEntityPointersArray& letters, float degAngle)
 {
-	LEVEL0_CHECK(letters);
+	if (letters.GetSize() <= 0) return 0;
 
 	float sinPlus = sin(KMathematics::DegreesToRadians(+degAngle));
 	float cosPlus = cos(KMathematics::DegreesToRadians(+degAngle));
@@ -116,23 +112,24 @@ double KItalics::WidthMethod(KEntityPointersArray& letters, float degAngle)
 	long italics = 0;
 
 	float initialWidth, leftMinus, rightMinus, leftPlus, rightPlus;
-	KEntity* entity;
+	KGenericEntity* entity;
+	KPropValue val;
 	KPointSet* convexHull;
 	float xRot, yRot, xCenter, yCenter;
 
 	for (int i = 0; i < letters.GetSize(); ++i)
 	{
-		entity = (KEntity*) letters[i];
+		entity = (KGenericEntity*) letters[i];
 
-		entity->RebuildOBB();
 		initialWidth = entity->boundingRectangle.Width();
 
-		entity->RebuildConvexHull();
-		convexHull = entity->ConvexHull;
+		entity->GetPropertyValue(CCS_CONVEX_HULL, val);
+		convexHull = (KPointSet*) (KPropertyInspector*) val;
 
-		entity->RebuildStatistics();
-		xCenter = entity->fltWeightCenterX;
-		yCenter = entity->fltWeightCenterY;
+		entity->GetPropertyValue(CCS_WEIGHTCENTER_X, val);
+		xCenter = (float) (double) val;
+		entity->GetPropertyValue(CCS_WEIGHTCENTER_Y, val);
+		yCenter = (float) (double) val;
 
 		leftMinus = rightMinus = leftPlus = rightPlus = -1;
 
@@ -162,15 +159,14 @@ Return: percentage of italic entities.
 */
 double KItalics::ChainMethod(KEntityPointersArray& letters, float degAngle)
 {
-	LEVEL0_CHECK(letters);
+	if (letters.GetSize() <= 0) return 0;
 
 	long italics = 0;
 
-	KEntity* entity;
-
+	KGenericEntity* entity;
 	for (int i = 0; i < letters.GetSize(); ++i)
 	{
-		entity = (KEntity*) letters[i];
+		entity = (KGenericEntity*) letters[i];
 
 		KImage img = BuildImage(*entity);
 		//int originalLenght = LongestVerticalRun(img);

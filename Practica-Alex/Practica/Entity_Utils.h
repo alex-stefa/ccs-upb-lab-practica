@@ -28,8 +28,18 @@ public:
 
 class KEntityPixelMapper
 {
+	struct Interval
+	{
+		int start, stop;
+		Interval() : start(0), stop(0) {}
+		Interval(int start, int stop) : start(start), stop(stop) {}
+	};
+
 public:
 	KEntityPixelMapper(int width, int height);
+
+	inline int GetWidth() { return width; }
+	inline int GetHeight() { return height; }
 
 	void AddEntity(KGenericEntity& entity, bool assertNoOverlapping = true);
 	void AddEntityArray(KEntityPointersArray& entities, bool assertNoOverlapping = true);
@@ -48,6 +58,12 @@ public:
 	const enum VicinityMode { CONNECTED_4 = 1, CONNECTED_8 = 2 };
 	void GetContourPoints(/*OUT*/ CArray<CPoint, CPoint>& contour, VicinityMode vicinityMode = KEntityPixelMapper::CONNECTED_8);
 	bool GetContourPoints(KGenericEntity& entity, /*OUT*/ CArray<CPoint, CPoint>& contour, VicinityMode vicinityMode = KEntityPixelMapper::CONNECTED_8);
+
+	void GetRowPixelCount(/*OUT*/ CArray<int, int>& rowCounts);
+	void GetColumnPixelCount(/*OUT*/ CArray<int, int>& columnCounts);
+
+	void GetEmptyRowIntervals(/*OUT*/ CArray<Interval, Interval&>& intervals);
+	void GetEmptyColumnIntervals(/*OUT*/ CArray<Interval, Interval&>& intervals);
 		
 	~KEntityPixelMapper();
 
@@ -66,5 +82,6 @@ private:
 	
 	static void GetNeighbours(VicinityMode vicinityMode, /*OUT*/ CArray<CPoint, CPoint>& neighbours);
 };
+
 
 

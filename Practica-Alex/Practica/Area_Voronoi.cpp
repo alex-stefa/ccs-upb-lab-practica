@@ -190,25 +190,26 @@ KAreaVoronoi::KVoronoiCell* KAreaVoronoi::MergeCells(KVoronoiCell& vcell1, KVoro
 
 		KVoronoiCell::EdgeMap::iterator mer_it = merged_cell->edges.find(other_cell);
 
+		other_cell->edges.erase(removed_cell);
+
 		if (mer_it != merged_cell->edges.end())
 		{
 			for (int i = mov_edge->lines->GetSize()-1; i >= 0; --i)
 				mer_it->second->lines->Add(mov_edge->lines->GetAt(i));
 			mov_edge->lines->RemoveAll();
-			other_cell->edges.erase(removed_cell);
-			++rem_it;
+			delete mov_edge;
 		}
 		else
 		{
 			merged_cell->edges[other_cell] = mov_edge;
-			other_cell->edges.erase(removed_cell);
 			other_cell->edges[merged_cell] = mov_edge;
 			if (mov_edge->cell1 == removed_cell) 
 				mov_edge->cell1 = merged_cell;
 			else
 				mov_edge->cell2 = merged_cell;
-			rem_it = removed_cell->edges.erase(rem_it);
 		}
+
+		rem_it = removed_cell->edges.erase(rem_it);
 	}
 
 	delete removed_cell;

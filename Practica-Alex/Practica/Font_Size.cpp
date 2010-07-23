@@ -11,13 +11,6 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-#define LEVEL0_CHECK(letters) \
-	if (letters.GetSize() == 0) return KHistogram(CArray<int>()); \
-	CString* baseType = letters[0]->GetDirectBaseType(); \
-	if (baseType && *baseType != CCS_LEVEL0) \
-	{ TRACE("Input entities are not LEVEL0 type!\n");  ASSERT(false); return KHistogram(CArray<int>()); } 
-
-
 bool KFontSize::DebugEnabled = false;
 char* KFontSize::DebugOutputPath = ".\\";
 char* KFontSize::FontSizeHistogramFilename = "fontsize";
@@ -26,17 +19,16 @@ char* KFontSize::FontSizeHistogramFilename = "fontsize";
 //! Returns histogram of entity heights
 KHistogram KFontSize::GetFontSizeHistogram(KEntityPointersArray& letters)
 {
-	LEVEL0_CHECK(letters);
+	ASSERT(letters.GetSize() != 0);
 
 	CArray<int> heights;
 	heights.SetSize(letters.GetSize());
 
-	KEntity* entity;
+	KGenericEntity* entity;
 
 	for (int i = 0; i < letters.GetSize(); ++i)
 	{
-		entity = (KEntity*) letters[i];
-		//entity->RebuildOBB();
+		entity = (KGenericEntity*) letters[i];
 		heights[i] = entity->boundingRectangle.Height();
 	}
 
@@ -46,6 +38,8 @@ KHistogram KFontSize::GetFontSizeHistogram(KEntityPointersArray& letters)
 //! Computes peak values for low caps and high caps based on font size histogram
 void KFontSize::GetFontSize(KEntityPointersArray& letters, /*OUT*/ int* lowCaps, int* highCaps)
 {
+	if (letters.GetSize() == 0) return;
+
 	if (lowCaps == NULL && highCaps == NULL) return;
 	KHistogram sizeHist = GetFontSizeHistogram(letters);
 	if (sizeHist.GetSize() == 0) return;

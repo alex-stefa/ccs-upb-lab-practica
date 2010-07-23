@@ -546,3 +546,46 @@ bool KEntityPixelMapper::GetContourPoints(KGenericEntity& entity, /*OUT*/ CArray
 	return true;
 }
 
+void KEntityPixelMapper::GetRowPixelCount(/*OUT*/ CArray<int, int>& rowCounts)
+{
+	rowCounts.RemoveAll();
+	rowCounts.SetSize(height);
+
+	for (int i = 0; i < height; ++i) rowCounts[i] = 0;
+
+	for (int row = 0; row < height; ++row)
+		for (int column = 0; column < width; ++column)
+			if (map[row][column] != unmapped)
+				++rowCounts[row];
+}
+
+void KEntityPixelMapper::GetColumnPixelCount(/*OUT*/ CArray<int, int>& columnCounts)
+{
+	columnCounts.RemoveAll();
+	columnCounts.SetSize(width);
+
+	for (int i = 0; i < width; ++i) columnCounts[i] = 0;
+
+	for (int row = 0; row < height; ++row)
+		for (int column = 0; column < width; ++column)
+			if (map[row][column] != unmapped)
+				++columnCounts[column];
+}
+
+void KEntityPixelMapper::GetEmptyRowIntervals(/*OUT*/ CArray<KEntityPixelMapper::Interval, KEntityPixelMapper::Interval&>& intervals)
+{
+	intervals.RemoveAll();
+
+
+}
+
+void KEntityPixelMapper::GetEmptyColumnIntervals(/*OUT*/ CArray<KEntityPixelMapper::Interval, KEntityPixelMapper::Interval&>& intervals)
+{
+
+
+}
+
+
+
+
+
