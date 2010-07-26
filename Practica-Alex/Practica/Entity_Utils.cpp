@@ -273,6 +273,88 @@ void KEntityUtils::GenerateEntityContours(KGenericEntity& entity, /*OUT*/ KPoint
 	delete [] intLastV;
 }
 
+void KEntityUtils::GetOccupiedRowIntervals(KEntityPointersArray& entities,
+	/*OUT*/ CArray<KEntityUtils::Interval, KEntityUtils::Interval&>& intervals)
+{
+	intervals.RemoveAll();
+
+	int max_height = 65000;
+
+	bool* occupied = new bool[max_height];
+	for (int i = 0; i < max_height; ++i) occupied[i] = false;
+
+	for (int i = 0; i < entities.GetSize(); ++i)
+	{
+		KGenericEntity* entity = (KGenericEntity*) entities.GetAt(i);
+		for (int row = entity->boundingRectangle.top; row <= entity->boundingRectangle.bottom; ++row)
+		{
+			ASSERT(row < max_height);
+			occupied[row] = true;
+		}
+	}
+
+	int start = 0;
+	int stop = 0;
+
+	while (start < max_height)
+	{
+		while (start < max_height && !occupied[start]) ++start;
+		if (start >= max_height) break;
+		stop = start;
+		while (stop < max_height && occupied[stop]) ++stop;
+		intervals.Add(KEntityUtils::Interval(start, stop-1));
+		start = stop;
+	}
+
+	delete[] occupied;
+}
+
+void KEntityUtils::GetOccupiedColumnIntervals(KEntityPointersArray& entities, 
+	/*OUT*/ CArray<KEntityUtils::Interval, KEntityUtils::Interval&>& intervals)
+{
+	intervals.RemoveAll();
+
+	int max_width = 65000;
+
+	bool* occupied = new bool[max_width];
+	for (int i = 0; i < max_width; ++i) occupied[i] = false;
+
+	for (int i = 0; i < entities.GetSize(); ++i)
+	{
+		KGenericEntity* entity = (KGenericEntity*) entities.GetAt(i);
+		for (int column = entity->boundingRectangle.left; column <= entity->boundingRectangle.right; ++column)
+		{
+			ASSERT(column < max_width);
+			occupied[column] = true;
+		}
+	}
+
+	int start = 0;
+	int stop = 0;
+
+	while (start < max_width)
+	{
+		while (start < max_width && !occupied[start]) ++start;
+		if (start >= max_width) break;
+		stop = start;
+		while (stop < max_width && occupied[stop]) ++stop;
+		intervals.Add(KEntityUtils::Interval(start, stop-1));
+		start = stop;
+	}
+
+	delete[] occupied;
+}
+
+void KEntityUtils::GetComplementaryIntervals(CArray<KEntityUtils::Interval, KEntityUtils::Interval&>& origIntervals,
+		int minLimit, int maxLimit, /*OUT*/ CArray<KEntityUtils::Interval, KEntityUtils::Interval&>& compIntervals)
+{
+	//TODO: someday..
+
+
+
+}
+
+
 /****************************************************************************************************************/
 
 KEntityPixelMapper::KEntityPixelMapper(int width, int height) : width(width), height(height)
@@ -546,7 +628,7 @@ bool KEntityPixelMapper::GetContourPoints(KGenericEntity& entity, /*OUT*/ CArray
 	return true;
 }
 
-void KEntityPixelMapper::GetRowPixelCount(/*OUT*/ CArray<int, int>& rowCounts)
+void KEntityPixelMapper::GetRowPixelCount(/*OUT*/ CArray<int>& rowCounts)
 {
 	rowCounts.RemoveAll();
 	rowCounts.SetSize(height);
@@ -559,7 +641,7 @@ void KEntityPixelMapper::GetRowPixelCount(/*OUT*/ CArray<int, int>& rowCounts)
 				++rowCounts[row];
 }
 
-void KEntityPixelMapper::GetColumnPixelCount(/*OUT*/ CArray<int, int>& columnCounts)
+void KEntityPixelMapper::GetColumnPixelCount(/*OUT*/ CArray<int>& columnCounts)
 {
 	columnCounts.RemoveAll();
 	columnCounts.SetSize(width);
@@ -572,18 +654,10 @@ void KEntityPixelMapper::GetColumnPixelCount(/*OUT*/ CArray<int, int>& columnCou
 				++columnCounts[column];
 }
 
-void KEntityPixelMapper::GetEmptyRowIntervals(/*OUT*/ CArray<KEntityPixelMapper::Interval, KEntityPixelMapper::Interval&>& intervals)
-{
-	intervals.RemoveAll();
 
 
-}
-
-void KEntityPixelMapper::GetEmptyColumnIntervals(/*OUT*/ CArray<KEntityPixelMapper::Interval, KEntityPixelMapper::Interval&>& intervals)
-{
 
 
-}
 
 
 

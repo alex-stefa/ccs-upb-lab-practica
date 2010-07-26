@@ -4,6 +4,13 @@
 
 class KEntityUtils
 {
+	struct Interval
+	{
+		int start, stop;
+		Interval() : start(0), stop(0) {}
+		Interval(int start, int stop) : start(start), stop(stop) {}
+	};
+
 public:
 	const enum AverageMode { ARITHMETIC_MEAN = 1, HISTOGRAM_PEAK = 2 };
 	static float GetAverageWidth(KEntityPointersArray& entities, AverageMode mode = KEntityUtils::HISTOGRAM_PEAK);
@@ -23,18 +30,19 @@ public:
 	
 	static void GenerateEntityContours(KGenericEntity& entity, 
 		/*OUT*/ KPointSet& exteriorPoints, KPointSet& interiorPoints);
+
+	static void GetOccupiedRowIntervals(KEntityPointersArray& entities, 
+		/*OUT*/ CArray<Interval, Interval&>& intervals);
+	static void GetOccupiedColumnIntervals(KEntityPointersArray& entities, 
+		/*OUT*/ CArray<Interval, Interval&>& intervals);
+	static void GetComplementaryIntervals(CArray<Interval, Interval&>& origIntervals, int minLimit, int maxLimit,
+		/*OUT*/ CArray<Interval, Interval&>& compIntervals);
+
 };
 
 
 class KEntityPixelMapper
 {
-	struct Interval
-	{
-		int start, stop;
-		Interval() : start(0), stop(0) {}
-		Interval(int start, int stop) : start(start), stop(stop) {}
-	};
-
 public:
 	KEntityPixelMapper(int width, int height);
 
@@ -59,12 +67,9 @@ public:
 	void GetContourPoints(/*OUT*/ CArray<CPoint, CPoint>& contour, VicinityMode vicinityMode = KEntityPixelMapper::CONNECTED_8);
 	bool GetContourPoints(KGenericEntity& entity, /*OUT*/ CArray<CPoint, CPoint>& contour, VicinityMode vicinityMode = KEntityPixelMapper::CONNECTED_8);
 
-	void GetRowPixelCount(/*OUT*/ CArray<int, int>& rowCounts);
-	void GetColumnPixelCount(/*OUT*/ CArray<int, int>& columnCounts);
+	void GetRowPixelCount(/*OUT*/ CArray<int>& rowCounts);
+	void GetColumnPixelCount(/*OUT*/ CArray<int>& columnCounts);
 
-	void GetEmptyRowIntervals(/*OUT*/ CArray<Interval, Interval&>& intervals);
-	void GetEmptyColumnIntervals(/*OUT*/ CArray<Interval, Interval&>& intervals);
-		
 	~KEntityPixelMapper();
 
 private:
