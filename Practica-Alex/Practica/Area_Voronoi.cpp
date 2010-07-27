@@ -46,19 +46,47 @@ KAreaVoronoi::~KAreaVoronoi()
 		delete voronoiCells->GetAt(i);
 	delete voronoiCells;
 
+	EdgeIterator it = voronoiEdges.begin();
+	while (it != voronoiEdges.end())
+	{
+		delete *it;
+		it = voronoiEdges.erase(it);
+	}
+
 	toDelete->DestroyAllEntities();
 	delete toDelete;
 }
 
 
+bool KAreaVoronoi::DeleteEdge(KVoronoiEdge* edge)
+{
+	for (EdgeIterator it = voronoiEdges.begin(); it != voronoiEdges.end(); ++it)
+		if (*it == edge)
+		{
+			delete *it;
+			it = voronoiEdges.erase(it);
+			return true;
+		}
+	return false;
+}
+
+
+bool KAreaVoronoi::IsValid(KVoronoiEdge& edge)
+{
+	for (EdgeIterator it = voronoiEdges.begin(); it != voronoiEdges.end(); ++it)
+		if (*it == &edge)
+			return true;
+	return false;
+}
+
+
 void KAreaVoronoi::BuildAreaVoronoiDiagram(int sampleRate, float voronoiMinDist)
 {
-	for (int i = 0; i < voronoiCells->GetSize(); ++i)
+	EdgeIterator it = voronoiEdges.begin();
+	while (it != voronoiEdges.end())
 	{
-		KVoronoiCell* cell = voronoiCells->GetAt(i);
-		for (KVoronoiCell::EdgeMap::iterator it = cell->edges.begin(); it != cell->edges.end(); ++it)
-			if (it->second->cell1 == cell)
-				delete it->second;
+		delete *it;
+		it = voronoiEdges.erase(it);
 	}
 
 	KEntityPixelMapper* mapper = new KEntityPixelMapper(width, height);
@@ -89,7 +117,7 @@ void KAreaVoronoi::BuildAreaVoronoiDiagram(int sampleRate, float voronoiMinDist)
 	VoronoiDiagramGenerator vdg;
     
     float x1, y1, x2, y2, xs1, ys1, xs2, ys2;
-    vdg.generateVoronoi(x, y, (long) size, 0, width, 0, height, voronoiMinDist);
+    vdg.generateVoronoi(x, y, (long) size, 0.0f, (float) width, 0.0f, (float) height, voronoiMinDist);
 
     delete[] x;
     delete[] y;
@@ -115,6 +143,7 @@ void KAreaVoronoi::BuildAreaVoronoiDiagram(int sampleRate, float voronoiMinDist)
 			if (edge1 == NULL || edge2 == NULL)
 			{
 				KVoronoiEdge* newEdge = new KVoronoiEdge(*cell1, *cell2);
+				voronoiEdges.push_back(newEdge);
 				cell1->edges[cell2] = newEdge;
 				cell2->edges[cell1] = newEdge;
 				newEdge->lines->Add(new KVoronoiLine(x1, y1, x2, y2, 
@@ -163,7 +192,7 @@ KAreaVoronoi::KVoronoiCell* KAreaVoronoi::MergeCells(KVoronoiCell& vcell1, KVoro
 	cell1->edges.erase(edge_it1);
 	cell2->edges.erase(edge_it2);
 
-	delete common_edge;
+	DeleteEdge(common_edge);
 
 	ASSERT(cell1->entity->ImagePageOwner == cell2->entity->ImagePageOwner);
 
@@ -197,7 +226,7 @@ KAreaVoronoi::KVoronoiCell* KAreaVoronoi::MergeCells(KVoronoiCell& vcell1, KVoro
 			for (int i = mov_edge->lines->GetSize()-1; i >= 0; --i)
 				mer_it->second->lines->Add(mov_edge->lines->GetAt(i));
 			mov_edge->lines->RemoveAll();
-			delete mov_edge;
+			DeleteEdge(mov_edge);
 		}
 		else
 		{
@@ -236,20 +265,15 @@ void KAreaVoronoi::DrawVoronoiDiagram(KImage& image, KRGBColor& edgeColor)
 
 	image.BeginDirectAccess(true);
 
-	for (int i = 0; i < voronoiCells->GetSize(); ++i)
-	{
-		KVoronoiCell* cell = voronoiCells->GetAt(i);
-		for (KVoronoiCell::EdgeMap::iterator it = cell->edges.begin(); it != cell->edges.end(); ++it)
-			if (it->second->cell1 = cell)
-				for (int j = it->second->lines->GetSize()-1; j >= 0; --j)
-				{
-					KVoronoiLine* line = it->second->lines->GetAt(j);
-					KIterators::BresenhamLineIterator(
-						VALID_W(line->point1.x), VALID_H(line->point1.y), 
-						VALID_W(line->point2.x), VALID_H(line->point2.y), 
-						__KIterators__Put24BPPPixel, &image, &edgeColor);
-				}
-	}
+	for (EdgeIterator it = voronoiEdges.begin(); it != voronoiEdges.end(); ++it)
+		for (int j = (*it)->lines->GetSize()-1; j >= 0; --j)
+		{
+			KVoronoiLine* line = (*it)->lines->GetAt(j);
+			KIterators::BresenhamLineIterator(
+				VALID_W(line->point1.x), VALID_H(line->point1.y), 
+				VALID_W(line->point2.x), VALID_H(line->point2.y), 
+				__KIterators__Put24BPPPixel, &image, &edgeColor);
+		}
 
 	image.EndDirectAccess();
 }

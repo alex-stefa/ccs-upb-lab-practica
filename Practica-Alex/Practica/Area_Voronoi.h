@@ -8,6 +8,8 @@
 #include "voronoi/vzdelaunay.h"
 #include "../KImage/Iterators.h"
 #include <map>
+#include <list>
+
 
 class KAreaVoronoi
 {
@@ -87,12 +89,7 @@ class KAreaVoronoi
 
 		KVoronoiCell(KGenericEntity& entity) : entity(&entity) {}
 
-		~KVoronoiCell()
-		{
-			for (EdgeMap::iterator it = edges.begin(); it != edges.end(); ++it)
-				if (it->second->cell1 == this)
-					delete it->second;
-		}
+		~KVoronoiCell() {}
 
 		float GetMinDistance();
 		KVoronoiPoint GetCenterPoint();
@@ -123,5 +120,10 @@ private:
 	int width, height;
 	std::map<KGenericEntity*, KVoronoiCell*> cellMap;	
 	CArray<KVoronoiCell*, KVoronoiCell*>* voronoiCells;
+	std::list<KVoronoiEdge*> voronoiEdges;
 	KEntityPointersArray* toDelete;
+	typedef std::list<KVoronoiEdge*>::iterator EdgeIterator;
+
+	bool DeleteEdge(KVoronoiEdge* edge);
+	bool IsValid(KVoronoiEdge& edge);
 };
