@@ -71,10 +71,11 @@ bool KAreaVoronoi::DeleteEdge(KVoronoiEdge* edge)
 }
 
 
-bool KAreaVoronoi::IsValid(KVoronoiEdge& edge)
+bool KAreaVoronoi::IsValid(KVoronoiEdge* edge)
 {
+	if (edge == NULL) return false;
 	for (EdgeIterator it = voronoiEdges.begin(); it != voronoiEdges.end(); ++it)
-		if (*it == &edge)
+		if (*it == edge)
 			return true;
 	return false;
 }
@@ -163,6 +164,7 @@ void KAreaVoronoi::BuildAreaVoronoiDiagram(int sampleRate, float voronoiMinDist)
 
 	delete mapper;
 }
+
 
 KAreaVoronoi::KVoronoiCell* KAreaVoronoi::MergeCells(KVoronoiCell& vcell1, KVoronoiCell& vcell2)
 {
@@ -253,6 +255,7 @@ void KAreaVoronoi::GetEntities(/*OUT*/ KEntityPointersArray& entities)
 	for (int i = 0; i < voronoiCells->GetSize(); ++i)
 		entities[i] = voronoiCells->GetAt(i)->entity;
 }
+
 
 #define VALID_W(x) max(0.0f, min(x, width-1))
 #define VALID_H(x) max(0.0f, min(x, height-1))

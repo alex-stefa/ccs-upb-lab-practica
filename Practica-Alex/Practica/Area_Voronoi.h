@@ -125,5 +125,5 @@ private:
 	typedef std::list<KVoronoiEdge*>::iterator EdgeIterator;
 
 	bool DeleteEdge(KVoronoiEdge* edge);
-	bool IsValid(KVoronoiEdge& edge);
+	bool IsValid(KVoronoiEdge* edge);
 };
