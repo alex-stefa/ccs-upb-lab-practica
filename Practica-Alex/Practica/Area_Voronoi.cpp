@@ -370,7 +370,7 @@ bool KAreaVoronoi::ShouldRemoveEdge(KVoronoiEdge& edge)
 {
 	KPageRectangle& rect1 = edge.cell1->entity->boundingRectangle;
 	KPageRectangle& rect2 = edge.cell2->entity->boundingRectangle;
-	if (rect1.top > rect2.bottom || rect1.bottom < rect2.top)
+	if (rect1.top > rect2.bottom || rect1.bottom < rect2.top) // no overlap
 		return false;
 
 	if (edge.GetMinDistance() > 2 * min(edge.cell1->GetMinDistance(), edge.cell2->GetMinDistance()))
