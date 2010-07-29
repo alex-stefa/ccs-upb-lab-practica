@@ -14,15 +14,28 @@
 #define new DEBUG_NEW
 #endif
 
+#define INPUT_FOLDER CString("..\\Test_Images\\input\\")
+#define OUTPUT_FOLDER CString("..\\Test_Images\\input\\")
+#define DEFAULT_EXTENSION CString(".tif")
+
+#define FULL_INPUT_FILE(filename) INPUT_FOLDER + CString(filename) + DEFAULT_EXTENSION
+#define FULL_OUTPUT_FILE(filename) OUTPUT_FOLDER + CString(filename) + DEFAULT_EXTENSION
+
+//#define BASE_FILE "01BPP"
+//#define BASE_FILE "01BPP2"
+#define BASE_FILE "otsu2d"
+
+#define INPUT_FILE FULL_INPUT_FILE(BASE_FILE)
+#define OUTPUT_FILE(sufix) FULL_OUTPUT_FILE(CString(BASE_FILE) + CString(sufix))
 
 using namespace std;
+
 
 int main(int argc, char* argv)
 {
 	clock_t start_time = clock();
 
-	//KImage* pTestImg = new KImage(CString("..\\Test_Images\\input\\01BPP.tif"), NULL);
-	KImage* pTestImg = new KImage(CString("..\\Test_Images\\input\\01BPP2.tif"), NULL);
+	KImage* pTestImg = new KImage(INPUT_FILE, NULL);
 	ASSERT(pTestImg->IsBitonal());
 
 	KImagePage* pImgPage = new KImagePage(pTestImg);
@@ -46,61 +59,58 @@ int main(int argc, char* argv)
 	//TRACE("Removed if not in [0..5]*avg_size: %d\n", KEntityUtils::FilterBySize(*entities, *entities, 
 	//	0, 0, 5 * avg_width_mean, 5 * avg_height_mean));
 
-	//KImage outImg(pTestImg->GetPixelSize(), 24);
-	//outImg.Invert();
-	//KEntityDrawing::DrawEntityArray(outImg, *entities, KEntityDrawing::BOUNDING_RECTANGLE + KEntityDrawing::ENTITY_PIXELS);
-	//outImg.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-ent.tif"));
+	//{
+	//	KImage outImg(pTestImg->GetPixelSize(), 24);
+	//	outImg.Invert();
+	//	KEntityDrawing::DrawEntityArray(outImg, *entities, 
+	//		KEntityDrawing::BOUNDING_RECTANGLE + KEntityDrawing::ENTITY_PIXELS);
+	//	outImg.WriteImage(OUTPUT_FILE("-test-initial-entities"));
+	//}
 
 	TRACE("Initial Entity count: %d\n", entities->GetSize());
-	//KTextFilters::FilterLetters(*entities);
+	//KTextFilters::FilterLetters(*entities); // just inside filter !!
 	TRACE("Merged Entity count: %d\n", entities->GetSize());
 	
-	//KImage outImg2(pTestImg->GetPixelSize(), 24);
-	//outImg2.Invert();
-	//KEntityDrawing::DrawEntityArray(outImg2, *entities, KEntityDrawing::BOUNDING_RECTANGLE + KEntityDrawing::ENTITY_PIXELS);
-	//outImg2.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-filters-inside.tif"));
-
-	//TRACE("\nNumber of Pixels:\n");
-	//for (int i = 0; i < entities->GetSize(); ++i)
 	//{
-	//	KGenericEntity* pEntity = (KGenericEntity*) entities->GetAt(i);
-	//	KPropValue val;
-	//	pEntity->GetPropertyValue(CCS_NUMBER_OF_PIXELS, val);
-	//	TRACE("%d ", (int) val);
+	//	KImage outImg(pTestImg->GetPixelSize(), 24);
+	//	outImg.Invert();
+	//	KEntityDrawing::DrawEntityArray(outImg, *entities, 
+	//		KEntityDrawing::BOUNDING_RECTANGLE + KEntityDrawing::ENTITY_PIXELS);
+	//	outImg.WriteImage(OUTPUT_FILE("-test-filters-inside"));
 	//}
 
-	//TRACE("\nConvex Hull:\n");
-	//for (int i = 0; i < entities->GetSize(); ++i)
+	KAreaVoronoi* voronoize = new KAreaVoronoi(*entities, pTestImg->GetPixelWidth(), pTestImg->GetPixelHeight());
+	voronoize->BuildAreaVoronoiDiagram();
+	TRACE("Voronoi Cells: %d\n", voronoize->GetCellCount());
+	{
+		KImage outImg(pTestImg->GetPixelSize(), 24);
+		outImg.Invert();
+		voronoize->DrawVoronoiDiagram(outImg);
+		outImg.WriteImage(OUTPUT_FILE("-test-voronoi"));
+	}
+	int removed = voronoize->MergeEntities();
+	TRACE("Edges Removed: %d\n", removed);
+	{
+		KImage outImg(pTestImg->GetPixelSize(), 24);
+		outImg.Invert();
+		voronoize->DrawVoronoiDiagram(outImg);
+		outImg.WriteImage(OUTPUT_FILE("-test-voronoi-merged"));
+	}
+	delete voronoize;
+
+	//KEntityPointersArray* lines = new KEntityPointersArray();
+	//KTextLines::BuildLines(*entities, *lines);
+	//TRACE("Text Lines: %d\n", lines->GetSize());
 	//{
-	//	KGenericEntity* pEntity = (KGenericEntity*) entities->GetAt(i);
-	//	KPropValue val;
-	//	pEntity->GetPropertyValue(CCS_CONVEX_HULL, val);
-	//	KPointSet* hull = (KPointSet*) (KPropertyInspector*) val;
-	//	TRACE("%d ", hull->GetSize());
+	//	KImage outImg(pTestImg->GetPixelSize(), 24);
+	//	outImg.Invert();
+	//	KEntityDrawing::DrawEntityArray(outImg, *lines, 
+	//		KEntityDrawing::ENTITY_PIXELS + KEntityDrawing::BOUNDING_RECTANGLE);
+	//	outImg.WriteImage(OUTPUT_FILE("-test-lines"));
 	//}
+	//delete lines;
 
-	//KAreaVoronoi* voronoize = new KAreaVoronoi(*entities, pTestImg->GetPixelWidth(), pTestImg->GetPixelHeight());
-	//voronoize->BuildAreaVoronoiDiagram();
-	//TRACE("Voronoi Cells: %d\n", voronoize->GetCellCount());
-	//KImage outImg3(pTestImg->GetPixelSize(), 24);
-	//outImg3.Invert();
-	//voronoize->DrawVoronoiDiagram(outImg3);
-	//outImg3.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-voronoi.tif"));
-	////outImg3.WriteImage(CString("..\\Test_Images\\input\\01BPP2-test-voronoi.tif"));
-
-	//delete voronoize;
-
-	KEntityPointersArray* lines = new KEntityPointersArray();
-	KTextLines::BuildLines(*entities, *lines);
-	TRACE("Text Lines: %d\n", lines->GetSize());
-	KImage outImg4(pTestImg->GetPixelSize(), 24);
-	outImg4.Invert();
-	KEntityDrawing::DrawEntityArray(outImg4, *lines, KEntityDrawing::ENTITY_PIXELS + KEntityDrawing::BOUNDING_RECTANGLE);
-	//outImg4.WriteImage(CString("..\\Test_Images\\input\\01BPP-test-lines.tif"));
-	outImg4.WriteImage(CString("..\\Test_Images\\input\\01BPP2-test-lines.tif"));
-	delete lines;
 	KTextLines::DoCleanup();
-
 	KTextFilters::DoCleanup();
 
 	delete pImgPage;
