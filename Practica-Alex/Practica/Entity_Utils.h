@@ -2,14 +2,23 @@
 
 #pragma once
 
+#include "Discrete_Histogram.h"
+#include <set>
+
+
 class KEntityUtils
 {
+public:
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	struct Interval
 	{
 		int start, stop;
 		Interval() : start(0), stop(0) {}
 		Interval(int start, int stop) : start(start), stop(stop) {}
+
+		inline bool Includes(int begin, int end) { return (start <= begin) && (end <= stop); }
 	};
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 public:
 	const enum AverageMode { ARITHMETIC_MEAN = 1, HISTOGRAM_PEAK = 2 };
@@ -18,7 +27,8 @@ public:
 	
 	static int FilterBySize(KEntityPointersArray& initialEntities, 
 		/*OUT*/ KEntityPointersArray& filteredEntities, 
-		float minWidth = 0, float minHeight = 0, float maxWidth = 0, float maxHeight = 0, bool deleteFiltered = false);
+		float minWidth = 0, float minHeight = 0, float maxWidth = 0, float maxHeight = 0, 
+		bool deleteFiltered = false);
 	static int FilterBySize(KEntityPointersArray& initialEntities, 
 		/*OUT*/ KEntityPointersArray& filteredEntities, KEntityPointersArray& removedEntities,
 		float minWidth = 0, float minHeight = 0, float maxWidth = 0, float maxHeight = 0);
@@ -38,8 +48,15 @@ public:
 	static void GetComplementaryIntervals(CArray<Interval, Interval&>& origIntervals, int minLimit, int maxLimit,
 		/*OUT*/ CArray<Interval, Interval&>& compIntervals);
 
+	static void GroupByRowIntervals(KEntityPointersArray& entities, CArray<Interval, Interval&>& intervals,
+		/*OUT*/ CArray<KEntityPointersArray, KEntityPointersArray&>& groups);
+	static void GroupByColumnIntervals(KEntityPointersArray& entities, CArray<Interval, Interval&>& intervals,
+		/*OUT*/ CArray<KEntityPointersArray, KEntityPointersArray&>& groups);
+
 };
 
+/*****************************************************************************************************************/
+/*****************************************************************************************************************/
 
 class KEntityPixelMapper
 {
@@ -62,6 +79,8 @@ public:
 	void GetEntities(CRect& rect, /*OUT*/ KEntityPointersArray& entities, bool containedInRect = false);
 	int GetEntityCount();
 	int GetEntityCount(CRect& rect, bool containedInRect = false);
+
+	inline int GetIndexAtPixel(int column, int row) { return map[row][column]; }
 
 	const enum VicinityMode { CONNECTED_4 = 1, CONNECTED_8 = 2 };
 	void GetContourPoints(/*OUT*/ CArray<CPoint, CPoint>& contour, VicinityMode vicinityMode = KEntityPixelMapper::CONNECTED_8);
@@ -88,5 +107,6 @@ private:
 	static void GetNeighbours(VicinityMode vicinityMode, /*OUT*/ CArray<CPoint, CPoint>& neighbours);
 };
 
-
+/*****************************************************************************************************************/
+/*****************************************************************************************************************/
 

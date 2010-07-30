@@ -2,13 +2,11 @@
 #include "StdAfx.h"
 #include "Discrete_Histogram.h"
 
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
-
 
 #define MIRROR(index) (((index) < 0) ? (-(index)) : (((index) >= size) ? (2*size-(index)-2) : (index)))
 

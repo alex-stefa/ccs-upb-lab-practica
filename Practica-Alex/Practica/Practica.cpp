@@ -21,9 +21,9 @@
 #define FULL_INPUT_FILE(filename) INPUT_FOLDER + CString(filename) + DEFAULT_EXTENSION
 #define FULL_OUTPUT_FILE(filename) OUTPUT_FOLDER + CString(filename) + DEFAULT_EXTENSION
 
-//#define BASE_FILE "01BPP"
+#define BASE_FILE "01BPP"
 //#define BASE_FILE "01BPP2"
-#define BASE_FILE "otsu2d"
+//#define BASE_FILE "otsu2d"
 
 #define INPUT_FILE FULL_INPUT_FILE(BASE_FILE)
 #define OUTPUT_FILE(sufix) FULL_OUTPUT_FILE(CString(BASE_FILE) + CString(sufix))

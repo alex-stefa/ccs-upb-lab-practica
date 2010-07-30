@@ -21,7 +21,7 @@ public:
 	public:
 		KVoronoiCoordinate() : x(0), y(0) {}
 		KVoronoiCoordinate(N x, N y) : x(x), y(y) {}
-		KVoronoiCoordinate(KVoronoiCoordinate& point) : x(point.x), y(point.y) {}
+		KVoronoiCoordinate(const KVoronoiCoordinate& point) : x(point.x), y(point.y) {}
 
 		~KVoronoiCoordinate() {}
 
@@ -66,9 +66,11 @@ public:
 		inline KVoronoiCell* GetOtherCell(KVoronoiCell* cell) { return (cell == cell1) ? cell2 : cell1; }
 		inline void SetNeedRecompute() { needRecompute = true; };
 
+		typedef std::list<KVoronoiLine> LineList;
+
+		LineList lines;
 		KVoronoiCell* cell1;
 		KVoronoiCell* cell2;
-		CArray<KVoronoiLine, KVoronoiLine&> lines;
 
 	private:
 		bool needRecompute;
@@ -80,8 +82,6 @@ public:
 	class KVoronoiCell
 	{
 	public:
-		typedef std::map<KVoronoiCell*, KVoronoiEdge*> EdgeMap;
-
 		KVoronoiCell(KGenericEntity& entity) : entity(&entity), needRecompute(true) {}
 
 		~KVoronoiCell() {}
@@ -96,8 +96,12 @@ public:
 				(it->second)->SetNeedRecompute();
 		}
 
-		KGenericEntity* entity;
+		typedef std::map<KVoronoiCell*, KVoronoiEdge*> EdgeMap;
+		typedef std::list<KVoronoiSite> SiteList;
+
 		EdgeMap edges;
+		SiteList sites;
+		KGenericEntity* entity;
 
 	private:
 		bool needRecompute;
@@ -122,12 +126,15 @@ public:
 	inline KVoronoiCell& GetCell(int index) { return *(voronoiCells[index]); }
 
 private:
+	typedef std::list<KVoronoiEdge*> EdgeList;
+	typedef std::map<KGenericEntity*, KVoronoiCell*> CellMap;
+	typedef CArray<KVoronoiCell*, KVoronoiCell*> CellList;
+
 	int width, height;
-	std::map<KGenericEntity*, KVoronoiCell*> cellMap;	
-	CArray<KVoronoiCell*, KVoronoiCell*> voronoiCells;
-	std::list<KVoronoiEdge*> voronoiEdges;
+	CellMap cellMap;	
+	CellList voronoiCells;
+	EdgeList voronoiEdges;
 	KEntityPointersArray* toDelete;
-	typedef std::list<KVoronoiEdge*>::iterator EdgeIterator;
 
 	KVoronoiCell* RemoveEdge(KVoronoiEdge* edge);
 	bool ShouldRemoveEdge(KVoronoiEdge& edge);

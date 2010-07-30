@@ -1,8 +1,6 @@
 
 #include "StdAfx.h"
 #include "Entity_Utils.h"
-#include "Discrete_Histogram.h"
-#include <set>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -354,7 +352,35 @@ void KEntityUtils::GetComplementaryIntervals(CArray<KEntityUtils::Interval, KEnt
 
 }
 
+void KEntityUtils::GroupByRowIntervals(KEntityPointersArray& entities, CArray<KEntityUtils::Interval, KEntityUtils::Interval&>& intervals,
+		/*OUT*/ CArray<KEntityPointersArray, KEntityPointersArray&>& groups)
+{
+	groups.SetSize(intervals.GetSize());
 
+	for (int ent = 0; ent < entities.GetSize(); ++ent)
+	{
+		KGenericEntity* entity = (KGenericEntity*) entities[ent];
+		for (int ival = 0; ival < intervals.GetSize(); ++ival)
+			if (intervals[ival].Includes(entity->boundingRectangle.top, entity->boundingRectangle.bottom))
+				groups[ival].Add(entity);
+	}
+}
+
+
+void KEntityUtils::GroupByColumnIntervals(KEntityPointersArray& entities, CArray<KEntityUtils::Interval, KEntityUtils::Interval&>& intervals,
+		/*OUT*/ CArray<KEntityPointersArray, KEntityPointersArray&>& groups)
+{
+	for (int ent = 0; ent < entities.GetSize(); ++ent)
+	{
+		KGenericEntity* entity = (KGenericEntity*) entities[ent];
+		for (int ival = 0; ival < intervals.GetSize(); ++ival)
+			if (intervals[ival].Includes(entity->boundingRectangle.left, entity->boundingRectangle.right))
+				groups[ival].Add(entity);
+	}
+}
+
+
+/****************************************************************************************************************/
 /****************************************************************************************************************/
 
 KEntityPixelMapper::KEntityPixelMapper(int width, int height) : width(width), height(height)

@@ -47,7 +47,7 @@ KAreaVoronoi::~KAreaVoronoi()
 	for (int i = 0; i < voronoiCells.GetSize(); ++i)
 		delete voronoiCells[i];
 
-	EdgeIterator it = voronoiEdges.begin();
+	EdgeList::iterator it = voronoiEdges.begin();
 	while (it != voronoiEdges.end())
 	{
 		delete *it;
@@ -61,7 +61,7 @@ KAreaVoronoi::~KAreaVoronoi()
 
 bool KAreaVoronoi::DeleteEdge(KVoronoiEdge* edge)
 {
-	for (EdgeIterator it = voronoiEdges.begin(); it != voronoiEdges.end(); ++it)
+	for (EdgeList::iterator it = voronoiEdges.begin(); it != voronoiEdges.end(); ++it)
 		if (*it == edge)
 		{
 			delete *it;
@@ -75,7 +75,7 @@ bool KAreaVoronoi::DeleteEdge(KVoronoiEdge* edge)
 bool KAreaVoronoi::IsValid(KVoronoiEdge* edge)
 {
 	if (edge == NULL) return false;
-	for (EdgeIterator it = voronoiEdges.begin(); it != voronoiEdges.end(); ++it)
+	for (EdgeList::iterator it = voronoiEdges.begin(); it != voronoiEdges.end(); ++it)
 		if (*it == edge)
 			return true;
 	return false;
@@ -84,7 +84,7 @@ bool KAreaVoronoi::IsValid(KVoronoiEdge* edge)
 
 void KAreaVoronoi::BuildAreaVoronoiDiagram(int sampleRate, float voronoiMinDist)
 {
-	EdgeIterator it = voronoiEdges.begin();
+	EdgeList::iterator it = voronoiEdges.begin();
 	while (it != voronoiEdges.end())
 	{
 		delete *it;
@@ -95,8 +95,9 @@ void KAreaVoronoi::BuildAreaVoronoiDiagram(int sampleRate, float voronoiMinDist)
 
 	for (int i = 0; i < voronoiCells.GetSize(); ++i)
 	{
-		voronoiCells[i]->SetNeedRecompute();
 		voronoiCells[i]->edges.clear();
+		voronoiCells[i]->sites.clear();
+		voronoiCells[i]->SetNeedRecompute();
 		KGenericEntity* entity = voronoiCells[i]->entity;
 		mapper->AddEntity(*entity);
 	}
@@ -104,7 +105,7 @@ void KAreaVoronoi::BuildAreaVoronoiDiagram(int sampleRate, float voronoiMinDist)
 	CArray<CPoint, CPoint>* contour = new CArray<CPoint, CPoint>();
 	mapper->GetContourPoints(*contour, KEntityPixelMapper::CONNECTED_8);
 
-	//TRACE("\nContour points: %d\n", contour->GetSize());
+	TRACE("\nContour points: %d\n", contour->GetSize());
 
 	int size = contour->GetSize() / sampleRate;
 	float* x = new float[size];
@@ -114,6 +115,9 @@ void KAreaVoronoi::BuildAreaVoronoiDiagram(int sampleRate, float voronoiMinDist)
 	{
 		x[i] = (float) contour->GetAt(i * sampleRate).x;
 		y[i] = (float) contour->GetAt(i * sampleRate).y;
+		//KGenericEntity* entity = mapper->GetEntityAtPixel((short) x[i], (short) y[i]);
+		//ASSERT(entity != NULL);
+		//cellMap[entity]->sites.push_back(KVoronoiSite((short) x[i], (short) y[i]));
 	}
 
 	delete contour;
@@ -128,17 +132,29 @@ void KAreaVoronoi::BuildAreaVoronoiDiagram(int sampleRate, float voronoiMinDist)
 
     vdg.resetIterator();
 
-    while (vdg.getNext(x1, y1, x2, y2, xs1, ys1, xs2, ys2))
+	TRACE("\nDiagram completed!\n", contour->GetSize());
+
+	while (vdg.getNext(x1, y1, x2, y2, xs1, ys1, xs2, ys2))
 	{
 		KGenericEntity* ent1 = mapper->GetEntityAtPixel((short) xs1, (short) ys1);
 		KGenericEntity* ent2 = mapper->GetEntityAtPixel((short) xs2, (short) ys2);
 		ASSERT(ent1 != NULL);
 		ASSERT(ent2 != NULL);
 
+		//int index1 = mapper->GetIndexAtPixel((int) xs1, (int) ys1);
+		//int index2 = mapper->GetIndexAtPixel((int) xs2, (int) ys2);
+		//ASSERT(index1 >= 0);
+		//ASSERT(index2 >= 0);
+
+		//if (index1 != index2)
 		if (ent1 != ent2)
 		{
 			KVoronoiCell* cell1 = cellMap[ent1];
 			KVoronoiCell* cell2 = cellMap[ent2];
+
+			//KVoronoiCell* cell1 = voronoiCells[index1];
+			//KVoronoiCell* cell2 = voronoiCells[index2];
+
 			KVoronoiEdge* edge1 = cell1->edges[cell2];
 			KVoronoiEdge* edge2 = cell2->edges[cell1];
 
@@ -150,16 +166,16 @@ void KAreaVoronoi::BuildAreaVoronoiDiagram(int sampleRate, float voronoiMinDist)
 				voronoiEdges.push_back(newEdge);
 				cell1->edges[cell2] = newEdge;
 				cell2->edges[cell1] = newEdge;
-				newEdge->lines.Add(KVoronoiLine(x1, y1, x2, y2, 
+				newEdge->lines.push_back(KVoronoiLine(x1, y1, x2, y2, 
 					(short) xs1, (short) ys1, (short) xs2, (short) ys2));
 			}
 			else
 			{
 				if (edge1->cell1 == cell1)
-					edge1->lines.Add(KVoronoiLine(x1, y1, x2, y2,
+					edge1->lines.push_back(KVoronoiLine(x1, y1, x2, y2,
 						(short) xs1, (short) ys1, (short) xs2, (short) ys2));
 				else
-					edge1->lines.Add(KVoronoiLine(x1, y1, x2, y2, 
+					edge1->lines.push_back(KVoronoiLine(x1, y1, x2, y2, 
 						(short) xs2, (short) ys2, (short) xs1, (short) ys1));
 			}
 		}
@@ -230,9 +246,7 @@ KAreaVoronoi::KVoronoiCell* KAreaVoronoi::RemoveEdge(KAreaVoronoi::KVoronoiEdge*
 
 		if (mer_it != merged_cell->edges.end())
 		{
-			for (int i = mov_edge->lines.GetSize()-1; i >= 0; --i)
-				mer_it->second->lines.Add(mov_edge->lines[i]);
-			mov_edge->lines.RemoveAll();
+			mer_it->second->lines.splice(mer_it->second->lines.end(), mov_edge->lines);
 			DeleteEdge(mov_edge);
 		}
 		else
@@ -247,6 +261,8 @@ KAreaVoronoi::KVoronoiCell* KAreaVoronoi::RemoveEdge(KAreaVoronoi::KVoronoiEdge*
 
 		rem_it = removed_cell->edges.erase(rem_it);
 	}
+
+	merged_cell->sites.splice(merged_cell->sites.end(), removed_cell->sites);
 
 	//merged_cell->SetNeedRecompute();
 
@@ -276,10 +292,10 @@ void KAreaVoronoi::DrawVoronoiDiagram(KImage& image, KRGBColor& edgeColor)
 
 	image.BeginDirectAccess(true);
 
-	for (EdgeIterator it = voronoiEdges.begin(); it != voronoiEdges.end(); ++it)
-		for (int j = (*it)->lines.GetSize()-1; j >= 0; --j)
+	for (EdgeList::iterator it_edge = voronoiEdges.begin(); it_edge != voronoiEdges.end(); ++it_edge)
+		for (KVoronoiEdge::LineList::iterator it_line = (*it_edge)->lines.begin(); it_line != (*it_edge)->lines.end(); ++it_line)
 		{
-			KVoronoiLine& line = (*it)->lines[j];
+			KVoronoiLine& line = *it_line;
 			KIterators::BresenhamLineIterator(
 				(int) VALID_W(line.point1.x), (int) VALID_H(line.point1.y), 
 				(int) VALID_W(line.point2.x), (int) VALID_H(line.point2.y), 
@@ -308,14 +324,18 @@ static float GetDistance(KAreaVoronoi::KVoronoiPoint& point, KAreaVoronoi::KVoro
 	float B = line.point1.x - line.point2.x;
 	float C = (line.point1.y * line.point2.x) - (line.point1.x * line.point2.y);
 
-	float distLine = abs(A * point.x + B * point.y + C) / sqrt(A * A + B * B);
+	float delta = sqrt(A * A + B * B);
+
+	if (delta < 0.001f) return EuclidDist(point, line.point1);
+
+	float distLine = abs(A * point.x + B * point.y + C) / delta;
 
 	float dist1 = (manhattan) ? ManhattanDist(point, line.point1) : EuclidDist(point, line.point1);
 	float dist2 = (manhattan) ? ManhattanDist(point, line.point2) : EuclidDist(point, line.point2);
 
 	float AP = 1;
 	float BP = - A/B;
-	float CP = - ((AP * point.x) + (BP * point.y));
+	float CP = - (AP * point.x) - (BP * point.y);
 
 	float sign1 = AP * line.point1.x + BP * line.point1.y + CP;
 	float sign2 = AP * line.point2.x + BP * line.point2.y + CP;
@@ -334,10 +354,10 @@ float KAreaVoronoi::KVoronoiEdge::GetMinDistance()
 
 		float currDist, dist1, dist2;
 
-		for (int i = 0; i < lines.GetCount(); ++i)
+		for (LineList::iterator it = lines.begin(); it != lines.end(); ++it)
 		{
-			dist1 = GetDistance(this->cell1->GetCenterPoint(), lines[i]);
-			dist2 = GetDistance(this->cell2->GetCenterPoint(), lines[i]);
+			dist1 = GetDistance(this->cell1->GetCenterPoint(), *it);
+			dist2 = GetDistance(this->cell2->GetCenterPoint(), *it);
 			currDist = min(dist1, dist2);
 			if (minDistance > currDist || minDistance < 0) minDistance = currDist;
 		}
@@ -385,14 +405,14 @@ bool KAreaVoronoi::ShouldRemoveEdge(KVoronoiEdge& edge)
 
 int KAreaVoronoi::MergeEntities()
 {
-	list<KVoronoiEdge*> marked;
+	EdgeList marked;
 
-	for (EdgeIterator it = voronoiEdges.begin(); it != voronoiEdges.end(); ++it)
+	for (EdgeList::iterator it = voronoiEdges.begin(); it != voronoiEdges.end(); ++it)
 		if (ShouldRemoveEdge(**it))
 			marked.push_back(*it);
 
 	int removed = 0;
-	for (EdgeIterator it = marked.begin(); it != marked.end(); ++it)
+	for (EdgeList::iterator it = marked.begin(); it != marked.end(); ++it)
 		if (RemoveEdge(*it) != NULL)
 			++removed;
 
